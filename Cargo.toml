@@ -3,5 +3,9 @@ name = "array2d"
 version = "0.1.0"
 authors = ["Harrison McCullough <mccullough.harrison@gmail.com>"]
 edition = "2018"
+description = "A statically-sized two-dimensional array"
+readme = "README.md"
+license = "MIT"
+repository = "https://github.com/HarrisonMc555/array2d"
 
 [dependencies]
