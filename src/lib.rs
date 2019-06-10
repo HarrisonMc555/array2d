@@ -1,6 +1,45 @@
 //! Array2D provides a statically-sized two-dimensional array. It is more
-//! efficient and can be easier to use than nested vectors (`Vec<Vec<T>>`). It
-//! enforces that all rows and columns are the same length.
+//! efficient and is easier to use than nested vectors, i.e. `Vec<Vec<T>>`.
+//!
+//! This is beneficial when using a grid-like structure, which is common in
+//! image processing, game boards, and other situations. This cannot be
+//! used when rows or columns might have different lengths, as they are required
+//! to all be the same length.
+//!
+//! # How to use [`Array2D`]
+//!
+//! ## Creating an [`Array2D`]
+//!
+//! An [`Array2D`] can be created by either pre-filling it with a repeated value
+//! or by providing it with the data to create the array with. This can be done
+//! by:
+//!   - Providing the rows or the columns, which must all be the same size (see
+//!     [`from_rows`] and [`from_columns`]).
+//!   - Providing a "flat" slice of elements along with the dimensions, which
+//!     must match the number of elements (see [`from_row_major`] and
+//!     [`from_column_major`]).
+//!
+//! ## Accessing data from an [`Array2D`]
+//!
+//! [`Array2D`] supports indexing using a tuple of `(usize, usize)` (which
+//! panics on out-of-bounds accesses) or through the [`get`], [`get_mut`], and
+//! [`set`] methods (which return an [`Option`] or a [`Result`] on out-of-bounds
+//! accesses)
+//!
+//! [`Array2D`] also supports several forms of iteration. You can iterate
+//! through:
+//!   - All of the elements, in either [row major or column major order] (see
+//!     [`elements_row_major_iter`] and [`elements_column_major_iter`]).
+//!   - Individual rows or columns (see [`row_iter`] and [`column_iter`]).
+//!   - All rows or all columns (see [`rows_iter`] and [`columns_iter`]).
+//!
+//! ## Extracting all data from an [`Array2D`]
+//!
+//! An [`Array2D`] can be converted back into a [`Vec`] through several
+//! methods. You can extract the data as:
+//!   - A [`Vec`] of rows or columns (see [`as_rows`] and [`as_columns`]).
+//!   - A "flat" [`Vec`] of elements in either [row major or column major order]
+//!     (see [`as_row_major`] and [`as_column_major`]).
 //!
 //! # Examples
 //!
@@ -36,13 +75,19 @@
 //!
 //!     // Index into an array using a tuple of usize to access or alter
 //!     // the array.
-//!     let mut array = Array2D::fill_with(42, 2, 3);
+//!     let rows = vec![vec![1, 2, 3], vec![4, 5, 6]];
+//!     let mut array = Array2D::from_rows(&rows);
 //!     array[(1, 1)] = 100;
-//!     let array_rows = array.as_rows();
 //!
 //!     // Convert the array back into a nested Vec using `as_rows` or
 //!     // `as_columns`.
-//!     assert_eq!(array_rows, vec![vec![42, 42, 42], vec![42, 100, 42]]);
+//!     let array_rows = array.as_rows();
+//!     assert_eq!(array_rows, vec![vec![1, 2, 3], vec![4, 100, 6]]);
+//!
+//!     // Convert the array back into a flat Vec using `as_row_major` or
+//!     // `as_column_major`.
+//!     let array_column_major = array.as_column_major();
+//!     assert_eq!(array_column_major, vec![1, 4, 2, 100, 3, 6]);
 //!
 //!     // Iterate over a single row or column
 //!     println!("First column:");
@@ -60,9 +105,31 @@
 //!     }
 //! }
 //! ```
+//!
+//! [`Array2D`]: struct.Array2D.html
+//! [`from_rows`]: struct.Array2D.html#method.from_rows
+//! [`from_columns`]: struct.Array2D.html#method.from_columns
+//! [`from_row_major`]: struct.Array2D.html#method.from_row_major
+//! [`from_column_major`]: struct.Array2D.html#method.from_column_major
+//! [`get`]: struct.Array2D.html#method.get
+//! [`get_mut`]: struct.Array2D.html#method.get_mut
+//! [`set`]: struct.Array2D.html#method.set
+//! [`elements_row_major_iter`]: struct.Array2D.html#method.elements_row_major_iter
+//! [`elements_column_major_iter`]: struct.Array2D.html#method.elements_column_major_iter
+//! [`row_iter`]: struct.Array2D.html#method.row_iter
+//! [`column_iter`]: struct.Array2D.html#method.column_iter
+//! [`rows_iter`]: struct.Array2D.html#method.rows_iter
+//! [`columns_iter`]: struct.Array2D.html#method.columns_iter
+//! [`as_rows`]: struct.Array2D.html#method.as_rows
+//! [`as_columns`]: struct.Array2D.html#method.as_columns
+//! [`as_row_major`]: struct.Array2D.html#method.as_row_major
+//! [`as_column_major`]: struct.Array2D.html#method.as_column_major
+//! [`Vec`]: https://doc.rust-lang.org/std/vec/struct.Vec.html
+//! [`Option`]: https://doc.rust-lang.org/std/option/
+//! [`Result`]: https://doc.rust-lang.org/std/result/
+//! [row major or column major order]: https://en.wikipedia.org/wiki/Row-_and_column-major_order
 
 #![deny(missing_docs)]
-mod example;
 
 use std::ops::{Index, IndexMut};
 
@@ -138,7 +205,7 @@ impl<T: Clone> Array2D<T> {
     }
 
     /// Creates a new [`Array2D`] from a [`Vec`] of columns, each of which
-    /// contains a [`Vec`] of elements..
+    /// contains a [`Vec`] of elements.
     ///
     /// # Panics
     ///
@@ -273,12 +340,12 @@ impl<T: Clone> Array2D<T> {
         self.num_rows * self.num_columns
     }
 
-    /// The length of each row, i.e. `num_columns`.
+    /// The number of elements in each row, i.e. the number of columns.
     pub fn row_len(&self) -> usize {
         self.num_columns
     }
 
-    /// The length of each column, i.e. `num_rows`.
+    /// The number of elements in each column, i.e. the number of rows.
     pub fn column_len(&self) -> usize {
         self.num_rows
     }
@@ -468,6 +535,13 @@ impl<T: Clone> Array2D<T> {
     /// # use array2d::Array2D;
     /// let rows = vec![vec![1, 2, 3], vec![4, 5, 6]];
     /// let array = Array2D::from_rows(&rows);
+    /// for row_iter in array.rows_iter() {
+    ///     for element in row_iter {
+    ///         print!("{} ", element);
+    ///     }
+    ///     println!();
+    /// }
+    ///
     /// let mut rows_iter = array.rows_iter();
     ///
     /// let mut first_row_iter = rows_iter.next().unwrap();
@@ -500,6 +574,13 @@ impl<T: Clone> Array2D<T> {
     /// # use array2d::Array2D;
     /// let rows = vec![vec![1, 2, 3], vec![4, 5, 6]];
     /// let array = Array2D::from_rows(&rows);
+    /// for column_iter in array.columns_iter() {
+    ///     for element in column_iter {
+    ///         print!("{} ", element);
+    ///     }
+    ///     println!();
+    /// }
+    ///
     /// let mut columns_iter = array.columns_iter();
     ///
     /// let mut first_column_iter = columns_iter.next().unwrap();
@@ -523,7 +604,7 @@ impl<T: Clone> Array2D<T> {
     /// [`Iterator`]: https://doc.rust-lang.org/std/iter/trait.Iterator.html
     /// [`Item`]: https://doc.rust-lang.org/std/iter/trait.Iterator.html#associatedtype.Item
     pub fn columns_iter(&self) -> impl Iterator<Item = impl Iterator<Item = &T>> {
-        (0..self.num_columns()).map(move |column_index| self.column_iter(column_index))
+        (0..self.num_columns).map(move |column_index| self.column_iter(column_index))
     }
 
     /// Collects the [`Array2D`] into a [`Vec`] of rows, each of which contains
