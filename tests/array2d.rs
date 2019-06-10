@@ -1,17 +1,17 @@
-use array2d::{Array2D};
+use array2d::Array2D;
 
 #[test]
 fn test_fill_with() {
-    let value = 7;
-    let array = Array2D::fill_with(value, 4, 5);
+    let element = 7;
+    let array = Array2D::fill_with(element, 4, 5);
     assert_eq!(array.num_rows(), 4);
     assert_eq!(array.num_columns(), 5);
-    assert_eq!(array.num_items(), 20);
-    for item in array.iter_items_row_major() {
-        assert_eq!(item, &7);
+    assert_eq!(array.num_elements(), 20);
+    for element in array.elements_row_major_iter() {
+        assert_eq!(element, &7);
     }
-    for item in array.iter_items_column_major() {
-        assert_eq!(item, &7);
+    for element in array.elements_column_major_iter() {
+        assert_eq!(element, &7);
     }
 }
 
@@ -37,8 +37,8 @@ fn test_from_row_major() {
     let num_columns = 3;
     let array = Array2D::from_row_major(&row_major, num_rows, num_columns);
     for (row_index, row) in rows.iter().enumerate() {
-        for (column_index, item) in row.iter().enumerate() {
-            assert_eq!(array.get(row_index, column_index), Some(item));
+        for (column_index, element) in row.iter().enumerate() {
+            assert_eq!(array.get(row_index, column_index), Some(element));
         }
     }
 }
@@ -51,8 +51,8 @@ fn test_from_column_major() {
     let num_columns = 3;
     let array = Array2D::from_column_major(&column_major, num_rows, num_columns);
     for (row_index, row) in rows.iter().enumerate() {
-        for (column_index, item) in row.iter().enumerate() {
-            assert_eq!(array.get(row_index, column_index), Some(item));
+        for (column_index, element) in row.iter().enumerate() {
+            assert_eq!(array.get(row_index, column_index), Some(element));
         }
     }
 }
@@ -83,18 +83,18 @@ fn test_get_mut() {
     let rows = vec![vec![1, 2, 3], vec![4, 5, 6]];
     let mut array = Array2D::from_rows(&rows);
     let (set_row, set_column) = (0, 2);
-    let value = 53;
-    let item_ref_option = array.get_mut(set_row, set_column);
-    assert!(item_ref_option.is_some());
-    let item_ref = item_ref_option.unwrap();
-    assert_eq!(item_ref, &rows[set_row][set_column]);
-    *item_ref = value;
-    assert_eq!(item_ref, &value);
+    let element = 53;
+    let element_ref_option = array.get_mut(set_row, set_column);
+    assert!(element_ref_option.is_some());
+    let element_ref = element_ref_option.unwrap();
+    assert_eq!(element_ref, &rows[set_row][set_column]);
+    *element_ref = element;
+    assert_eq!(element_ref, &element);
     for row in 0..rows.len() {
         for column in 0..rows[0].len() {
             let actual = array.get(row, column);
             if (row, column) == (set_row, set_column) {
-                assert_eq!(actual, Some(&value));
+                assert_eq!(actual, Some(&element));
             } else {
                 assert_eq!(actual, Some(&rows[row][column]));
             }
@@ -107,13 +107,13 @@ fn test_set() {
     let rows = vec![vec![1, 2, 3], vec![4, 5, 6]];
     let mut array = Array2D::from_rows(&rows);
     let (set_row, set_column) = (1, 0);
-    let value = 42;
-    array.set(set_row, set_column, value).unwrap();
+    let element = 42;
+    array.set(set_row, set_column, element).unwrap();
     for row in 0..rows.len() {
         for column in 0..rows[0].len() {
             let actual = array.get(row, column);
             if (row, column) == (set_row, set_column) {
-                assert_eq!(actual, Some(&value));
+                assert_eq!(actual, Some(&element));
             } else {
                 assert_eq!(actual, Some(&rows[row][column]));
             }
@@ -135,16 +135,16 @@ fn test_set() {
 //     let rows = vec![vec![1, 2, 3], vec![4, 5, 6]];
 //     let mut array = Array2D::from_rows(&rows);
 //     let row_index = 1;
-//     let row_values = vec![7, 8, 9];
+//     let row_elements = vec![7, 8, 9];
 //     let row_ref = array.get_row_mut(row_index);
 //     assert_eq!(row_ref, rows[row_index].as_slice());
-//     for (index, item) in row_ref.iter_mut().enumerate() {
-//         *item = row_values[index];
+//     for (index, element) in row_ref.mut_iter().enumerate() {
+//         *element = row_elements[index];
 //     }
 //     for row in 0..rows.len() {
 //         let actual = array.get_row(row);
 //         if row == row_index {
-//             assert_eq!(actual, row_values.as_slice());
+//             assert_eq!(actual, row_elements.as_slice());
 //         } else {
 //             assert_eq!(actual, rows[row].as_slice());
 //         }
@@ -156,12 +156,12 @@ fn test_set() {
 //     let rows = vec![vec![1, 2, 3], vec![4, 5, 6]];
 //     let mut array = Array2D::from_rows(&rows);
 //     let row_index = 1;
-//     let row_values = vec![7, 8, 9];
-//     array.set_row(1, &row_values);
+//     let row_elements = vec![7, 8, 9];
+//     array.set_row(1, &row_elements);
 //     for row in 0..rows.len() {
 //         let actual = array.get_row(row);
 //         if row == row_index {
-//             assert_eq!(actual, row_values.as_slice());
+//             assert_eq!(actual, row_elements.as_slice());
 //         } else {
 //             assert_eq!(actual, rows[row].as_slice());
 //         }
@@ -169,98 +169,90 @@ fn test_set() {
 // }
 
 // #[test]
-// fn test_iter_rows() {
+// fn test_rows_iter() {
 //     let rows = vec![vec![1, 2, 3], vec![4, 5, 6]];
 //     let array = Array2D::from_rows(&rows);
-//     for (index, row) in array.iter_rows().enumerate() {
+//     for (index, row) in array.rows_iter().enumerate() {
 //         assert_eq!(row, rows[index].as_slice());
 //     }
 // }
 
 #[test]
-fn test_iter_items_row_major() {
+fn test_elements_row_major_iter() {
     let rows = vec![vec![1, 2, 3], vec![4, 5, 6]];
     let row_major = vec![1, 2, 3, 4, 5, 6];
     let array = Array2D::from_rows(&rows);
     let row_len = rows[0].len();
-    for (index, item) in array.iter_items_row_major().enumerate() {
+    for (index, element) in array.elements_row_major_iter().enumerate() {
         let row_index = index / row_len;
         let column_index = index % row_len;
         // Do it both ways to make sure we're doing this right
-        assert_eq!(item, &rows[row_index][column_index]);
-        assert_eq!(item, &row_major[index]);
+        assert_eq!(element, &rows[row_index][column_index]);
+        assert_eq!(element, &row_major[index]);
     }
 }
 
 #[test]
-fn test_iter_items_column_major() {
+fn test_elements_column_major_iter() {
     let rows = vec![vec![1, 2, 3], vec![4, 5, 6]];
     let column_major = vec![1, 4, 2, 5, 3, 6];
     let array = Array2D::from_rows(&rows);
     let column_len = rows.len();
-    for (index, item) in array.iter_items_column_major().enumerate() {
+    for (index, element) in array.elements_column_major_iter().enumerate() {
         let column_index = index / column_len;
         let row_index = index % column_len;
         // Do it both ways to make sure we're doing this right
-        assert_eq!(item, &rows[row_index][column_index]);
-        assert_eq!(item, &column_major[index]);
+        assert_eq!(element, &rows[row_index][column_index]);
+        assert_eq!(element, &column_major[index]);
     }
 }
 
 #[test]
-fn test_iter_row() {
+fn test_row_iter() {
     let rows = vec![vec![1, 2, 3], vec![4, 5, 6]];
     let array = Array2D::from_rows(&rows);
-    let first_row_iter_option = array.iter_row(0);
-    assert!(first_row_iter_option.is_some());
-    let first_row_iter = first_row_iter_option.unwrap();
-    for (index, item) in first_row_iter.enumerate() {
-        assert_eq!(item, &rows[0][index]);
+    let first_row_iter = array.row_iter(0);
+    for (index, element) in first_row_iter.enumerate() {
+        assert_eq!(element, &rows[0][index]);
     }
-    let second_row_iter_option = array.iter_row(1);
-    assert!(second_row_iter_option.is_some());
-    let second_row_iter = second_row_iter_option.unwrap();
-    for (index, item) in second_row_iter.enumerate() {
-        assert_eq!(item, &rows[1][index]);
+    let second_row_iter = array.row_iter(1);
+    for (index, element) in second_row_iter.enumerate() {
+        assert_eq!(element, &rows[1][index]);
     }
 }
 
 #[test]
-fn test_iter_column() {
+fn test_column_iter() {
     let rows = vec![vec![1, 2, 3], vec![4, 5, 6]];
     let array = Array2D::from_rows(&rows);
-    let first_column_iter_option = array.iter_column(0);
-    assert!(first_column_iter_option.is_some());
-    let first_column_iter = first_column_iter_option.unwrap();
-    for (index, item) in first_column_iter.enumerate() {
-        assert_eq!(item, &rows[index][0]);
+    let first_column_iter = array.column_iter(0);
+    for (index, element) in first_column_iter.enumerate() {
+        assert_eq!(element, &rows[index][0]);
     }
-    let second_column_iter_option = array.iter_column(1);
-    assert!(second_column_iter_option.is_some());
-    let second_column_iter = second_column_iter_option.unwrap();
-    for (index, item) in second_column_iter.enumerate() {
-        assert_eq!(item, &rows[index][1]);
+    let second_column_iter = array.column_iter(1);
+    for (index, element) in second_column_iter.enumerate() {
+        assert_eq!(element, &rows[index][1]);
     }
 }
 
 #[test]
-fn test_iter_rows() {
+fn test_rows_iter() {
     let rows = vec![vec![1, 2, 3], vec![4, 5, 6]];
     let array = Array2D::from_rows(&rows);
-    for (row_index, row_iter) in array.iter_rows().enumerate() {
-        for (column_index, item) in row_iter.enumerate() {
-            assert_eq!(item, &rows[row_index][column_index]);
+    for (row_index, row_iter) in array.rows_iter().enumerate() {
+        for (column_index, element) in row_iter.enumerate() {
+            assert_eq!(element, &rows[row_index][column_index]);
         }
     }
 }
 
 #[test]
-fn test_iter_columns() {
+fn test_columns_iter() {
     let rows = vec![vec![1, 2, 3], vec![4, 5, 6]];
     let array = Array2D::from_rows(&rows);
-    for (column_index, column_iter) in array.iter_columns().enumerate() {
-        for (row_index, item) in column_iter.enumerate() {
-            assert_eq!(item, &rows[row_index][column_index]);
+    for (column_index, column_iter) in array.columns_iter().enumerate() {
+        for (row_index, element) in column_iter.enumerate() {
+            assert_eq!(element, &rows[row_index][column_index]);
         }
     }
 }
