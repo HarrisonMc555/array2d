@@ -1,8 +1,68 @@
 //! Array2D provides a statically-sized two-dimensional array. It is more
 //! efficient and can be easier to use than nested vectors (`Vec<Vec<T>>`). It
 //! enforces that all rows and columns are the same length.
+//!
+//! # Examples
+//!
+//! ```
+//! use array2d::Array2D;
+//!
+//! pub fn main() {
+//!     // Create an array filled with the same element.
+//!     let prefilled = Array2D::fill_with(42, 2, 3);
+//!     assert_eq!(prefilled.num_rows(), 2);
+//!     assert_eq!(prefilled.num_columns(), 3);
+//!     assert_eq!(prefilled[(0, 0)], 42);
+//!
+//!     // Create an array from the given rows. You can also use columns
+//!     // with the `from_columns` function
+//!     let rows = vec![vec![1, 2, 3], vec![4, 5, 6]];
+//!     let from_rows = Array2D::from_rows(&rows);
+//!     assert_eq!(from_rows.num_rows(), 2);
+//!     assert_eq!(from_rows.num_columns(), 3);
+//!     assert_eq!(from_rows[(1, 1)], 5);
+//!
+//!     // Create an array from a flat Vec of elements in row or column
+//!     // major order.
+//!     let column_major = vec![1, 4, 2, 5, 3, 6];
+//!     let from_column_major =
+//!         Array2D::from_column_major(&column_major, 2, 3);
+//!     assert_eq!(from_column_major.num_rows(), 2);
+//!     assert_eq!(from_column_major.num_columns(), 3);
+//!     assert_eq!(from_column_major[(1, 1)], 5);
+//!
+//!     // Implements `Eq` if the element type does.
+//!     assert_eq!(from_rows, from_column_major);
+//!
+//!     // Index into an array using a tuple of usize to access or alter
+//!     // the array.
+//!     let mut array = Array2D::fill_with(42, 2, 3);
+//!     array[(1, 1)] = 100;
+//!     let array_rows = array.as_rows();
+//!
+//!     // Convert the array back into a nested Vec using `as_rows` or
+//!     // `as_columns`.
+//!     assert_eq!(array_rows, vec![vec![42, 42, 42], vec![42, 100, 42]]);
+//!
+//!     // Iterate over a single row or column
+//!     println!("First column:");
+//!     for element in array.column_iter(0) {
+//!         println!("{}", element);
+//!     }
+//!
+//!     // Iterate over all rows or columns.
+//!     println!("All elements:");
+//!     for row_iter in array.rows_iter() {
+//!         for element in row_iter {
+//!             print!("{} ", element);
+//!         }
+//!         println!();
+//!     }
+//! }
+//! ```
 
 #![deny(missing_docs)]
+mod example;
 
 use std::ops::{Index, IndexMut};
 
@@ -347,10 +407,12 @@ impl<T: Clone> Array2D<T> {
     /// ```
     /// # use array2d::Array2D;
     /// let rows = vec![vec![1, 2, 3], vec![4, 5, 6]];
-    /// let row = vec![4, 5, 6];
     /// let array = Array2D::from_rows(&rows);
-    /// let row_iter = array.row_iter(1);
-    /// assert_eq!(row_iter.cloned().collect::<Vec<_>>(), row);
+    /// let mut row_iter = array.row_iter(1);
+    /// assert_eq!(row_iter.next(), Some(&4));
+    /// assert_eq!(row_iter.next(), Some(&5));
+    /// assert_eq!(row_iter.next(), Some(&6));
+    /// assert_eq!(row_iter.next(), None);
     /// ```
     ///
     /// # Panics
@@ -375,10 +437,11 @@ impl<T: Clone> Array2D<T> {
     /// ```
     /// # use array2d::Array2D;
     /// let rows = vec![vec![1, 2, 3], vec![4, 5, 6]];
-    /// let column = vec![2, 5];
     /// let array = Array2D::from_rows(&rows);
-    /// let column_iter = array.column_iter(1);
-    /// assert_eq!(column_iter.cloned().collect::<Vec<_>>(), column);
+    /// let mut column_iter = array.column_iter(1);
+    /// assert_eq!(column_iter.next(), Some(&2));
+    /// assert_eq!(column_iter.next(), Some(&5));
+    /// assert_eq!(column_iter.next(), None);
     /// ```
     ///
     /// # Panics
@@ -399,6 +462,29 @@ impl<T: Clone> Array2D<T> {
     /// Returns an [`Iterator`] over all rows. Each [`Item`] is itself another
     /// [`Iterator`] over references to the elements in that row.
     ///
+    /// # Examples
+    ///
+    /// ```
+    /// # use array2d::Array2D;
+    /// let rows = vec![vec![1, 2, 3], vec![4, 5, 6]];
+    /// let array = Array2D::from_rows(&rows);
+    /// let mut rows_iter = array.rows_iter();
+    ///
+    /// let mut first_row_iter = rows_iter.next().unwrap();
+    /// assert_eq!(first_row_iter.next(), Some(&1));
+    /// assert_eq!(first_row_iter.next(), Some(&2));
+    /// assert_eq!(first_row_iter.next(), Some(&3));
+    /// assert_eq!(first_row_iter.next(), None);
+    ///
+    /// let mut second_row_iter = rows_iter.next().unwrap();
+    /// assert_eq!(second_row_iter.next(), Some(&4));
+    /// assert_eq!(second_row_iter.next(), Some(&5));
+    /// assert_eq!(second_row_iter.next(), Some(&6));
+    /// assert_eq!(second_row_iter.next(), None);
+    ///
+    /// assert!(rows_iter.next().is_none());
+    /// ```
+    ///
     /// [`Iterator`]: https://doc.rust-lang.org/std/iter/trait.Iterator.html
     /// [`Item`]: https://doc.rust-lang.org/std/iter/trait.Iterator.html#associatedtype.Item
     pub fn rows_iter(&self) -> impl Iterator<Item = impl Iterator<Item = &T>> {
@@ -408,6 +494,32 @@ impl<T: Clone> Array2D<T> {
     /// Returns an [`Iterator`] over all columns. Each [`Item`] is itself
     /// another [`Iterator`] over references to the elements in that column.
     ///
+    /// # Examples
+    ///
+    /// ```
+    /// # use array2d::Array2D;
+    /// let rows = vec![vec![1, 2, 3], vec![4, 5, 6]];
+    /// let array = Array2D::from_rows(&rows);
+    /// let mut columns_iter = array.columns_iter();
+    ///
+    /// let mut first_column_iter = columns_iter.next().unwrap();
+    /// assert_eq!(first_column_iter.next(), Some(&1));
+    /// assert_eq!(first_column_iter.next(), Some(&4));
+    /// assert_eq!(first_column_iter.next(), None);
+    ///
+    /// let mut second_column_iter = columns_iter.next().unwrap();
+    /// assert_eq!(second_column_iter.next(), Some(&2));
+    /// assert_eq!(second_column_iter.next(), Some(&5));
+    /// assert_eq!(second_column_iter.next(), None);
+    ///
+    /// let mut third_column_iter = columns_iter.next().unwrap();
+    /// assert_eq!(third_column_iter.next(), Some(&3));
+    /// assert_eq!(third_column_iter.next(), Some(&6));
+    /// assert_eq!(third_column_iter.next(), None);
+    ///
+    /// assert!(columns_iter.next().is_none());
+    /// ```
+    ///
     /// [`Iterator`]: https://doc.rust-lang.org/std/iter/trait.Iterator.html
     /// [`Item`]: https://doc.rust-lang.org/std/iter/trait.Iterator.html#associatedtype.Item
     pub fn columns_iter(&self) -> impl Iterator<Item = impl Iterator<Item = &T>> {
@@ -416,6 +528,15 @@ impl<T: Clone> Array2D<T> {
 
     /// Collects the [`Array2D`] into a [`Vec`] of rows, each of which contains
     /// a [`Vec`] of elements.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// # use array2d::Array2D;
+    /// let rows = vec![vec![1, 2, 3], vec![4, 5, 6]];
+    /// let array = Array2D::from_rows(&rows);
+    /// assert_eq!(array.as_rows(), rows);
+    /// ```
     ///
     /// [`Array2D`]: struct.Array2D.html
     /// [`Vec`]: https://doc.rust-lang.org/std/vec/struct.Vec.html
@@ -428,12 +549,59 @@ impl<T: Clone> Array2D<T> {
     /// Collects the [`Array2D`] into a [`Vec`] of columns, each of which
     /// contains a [`Vec`] of elements.
     ///
+    /// # Examples
+    ///
+    /// ```
+    /// # use array2d::Array2D;
+    /// let columns = vec![vec![1, 4], vec![2, 5], vec![3, 6]];
+    /// let array = Array2D::from_columns(&columns);
+    /// assert_eq!(array.as_columns(), columns);
+    /// ```
+    ///
     /// [`Array2D`]: struct.Array2D.html
     /// [`Vec`]: https://doc.rust-lang.org/std/vec/struct.Vec.html
     pub fn as_columns(&self) -> Vec<Vec<T>> {
         self.columns_iter()
             .map(|column_iter| column_iter.cloned().collect())
             .collect()
+    }
+
+    /// Collects the [`Array2D`] into a [`Vec`] of elements in [row major
+    /// order].
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// # use array2d::Array2D;
+    /// let rows = vec![vec![1, 2, 3], vec![4, 5, 6]];
+    /// let array = Array2D::from_rows(&rows);
+    /// assert_eq!(array.as_row_major(), vec![1, 2, 3, 4, 5, 6]);
+    /// ```
+    ///
+    /// [`Array2D`]: struct.Array2D.html
+    /// [`Vec`]: https://doc.rust-lang.org/std/vec/struct.Vec.html
+    /// [row major order]: https://en.wikipedia.org/wiki/Row-_and_column-major_order
+    pub fn as_row_major(&self) -> Vec<T> {
+        self.elements_row_major_iter().cloned().collect()
+    }
+
+    /// Collects the [`Array2D`] into a [`Vec`] of elements in [column major
+    /// order].
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// # use array2d::Array2D;
+    /// let rows = vec![vec![1, 2, 3], vec![4, 5, 6]];
+    /// let array = Array2D::from_rows(&rows);
+    /// assert_eq!(array.as_column_major(), vec![1, 4, 2, 5, 3, 6]);
+    /// ```
+    ///
+    /// [`Array2D`]: struct.Array2D.html
+    /// [`Vec`]: https://doc.rust-lang.org/std/vec/struct.Vec.html
+    /// [column major order]: https://en.wikipedia.org/wiki/Row-_and_column-major_order
+    pub fn as_column_major(&self) -> Vec<T> {
+        self.elements_column_major_iter().cloned().collect()
     }
 
     fn get_index(&self, row: usize, column: usize) -> Option<usize> {
