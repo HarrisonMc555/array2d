@@ -1,9 +1,9 @@
 use array2d::Array2D;
 
 #[test]
-fn test_fill_with() {
+fn test_filled_with() {
     let element = 7;
-    let array = Array2D::fill_with(element, 4, 5);
+    let array = Array2D::filled_with(element, 4, 5);
     assert_eq!(array.num_rows(), 4);
     assert_eq!(array.num_columns(), 5);
     assert_eq!(array.num_elements(), 20);

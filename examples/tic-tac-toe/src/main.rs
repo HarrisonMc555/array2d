@@ -9,7 +9,7 @@ fn format_board(board: &Array2D<String>) -> String {
 }
 
 fn main() {
-    let mut board = Array2D::fill_with(" ".to_string(), 3, 3);
+    let mut board = Array2D::filled_with(" ".to_string(), 3, 3);
     println!("{}\n", format_board(&board));
     board[(0, 2)] = "X".to_string();
     println!("{}\n", format_board(&board));

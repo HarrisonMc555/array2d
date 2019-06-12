@@ -48,7 +48,7 @@
 //!
 //! pub fn main() {
 //!     // Create an array filled with the same element.
-//!     let prefilled = Array2D::fill_with(42, 2, 3);
+//!     let prefilled = Array2D::filled_with(42, 2, 3);
 //!     assert_eq!(prefilled.num_rows(), 2);
 //!     assert_eq!(prefilled.num_columns(), 3);
 //!     assert_eq!(prefilled[(0, 0)], 42);
@@ -158,12 +158,12 @@ impl<T: Clone> Array2D<T> {
     ///
     /// ```
     /// # use array2d::Array2D;
-    /// let array = Array2D::fill_with(42, 2, 3);
+    /// let array = Array2D::filled_with(42, 2, 3);
     /// assert_eq!(array.as_rows(), vec![vec![42, 42, 42], vec![42, 42, 42]]);
     /// ```
     ///
     /// [`Array2D`]: struct.Array2D.html
-    pub fn fill_with(element: T, num_rows: usize, num_columns: usize) -> Self {
+    pub fn filled_with(element: T, num_rows: usize, num_columns: usize) -> Self {
         let total_len = num_rows * num_columns;
         let array = vec![element; total_len];
         Array2D {
@@ -171,6 +171,12 @@ impl<T: Clone> Array2D<T> {
             num_rows,
             num_columns,
         }
+    }
+
+    #[deprecated(since = "0.2.0", note = "Renamed to filled_with")]
+    /// Renamed to filled_with
+    pub fn fill_with(element: T, num_rows: usize, num_columns: usize) -> Self {
+        Array2D::filled_with(element, num_rows, num_columns)
     }
 
     /// Creates a new [`Array2D`] from a [`Vec`] of rows, each of which is a
@@ -358,7 +364,7 @@ impl<T: Clone> Array2D<T> {
     ///
     /// ```
     /// # use array2d::Array2D;
-    /// let array = Array2D::fill_with(42, 2, 3);
+    /// let array = Array2D::filled_with(42, 2, 3);
     /// assert_eq!(array.get(0, 0), Some(&42));
     /// assert_eq!(array.get(10, 10), None);
     /// ```
@@ -377,7 +383,7 @@ impl<T: Clone> Array2D<T> {
     ///
     /// ```
     /// # use array2d::Array2D;
-    /// let mut array = Array2D::fill_with(42, 2, 3);
+    /// let mut array = Array2D::filled_with(42, 2, 3);
     ///
     /// assert_eq!(array.get_mut(0, 0), Some(&mut 42));
     /// assert_eq!(array.get_mut(10, 10), None);
@@ -404,7 +410,7 @@ impl<T: Clone> Array2D<T> {
     ///
     /// ```
     /// # use array2d::{Array2D, Error};
-    /// let mut array = Array2D::fill_with(42, 2, 3);
+    /// let mut array = Array2D::filled_with(42, 2, 3);
     ///
     /// let result = array.set(0, 0, 100);
     /// assert_eq!(result, Ok(()));
@@ -707,7 +713,7 @@ impl<T: Clone> Index<(usize, usize)> for Array2D<T> {
     ///
     /// ```
     /// # use array2d::Array2D;
-    /// let array = Array2D::fill_with(42, 2, 3);
+    /// let array = Array2D::filled_with(42, 2, 3);
     /// assert_eq!(array[(0, 0)], 42);
     /// ```
     fn index(&self, indices: (usize, usize)) -> &Self::Output {
@@ -728,7 +734,7 @@ impl<T: Clone> IndexMut<(usize, usize)> for Array2D<T> {
     ///
     /// ```
     /// # use array2d::Array2D;
-    /// let mut array = Array2D::fill_with(42, 2, 3);
+    /// let mut array = Array2D::filled_with(42, 2, 3);
     /// array[(0, 0)] = 100;
     /// assert_eq!(array[(0, 0)], 100);
     /// ```
