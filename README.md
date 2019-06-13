@@ -1,50 +1,53 @@
 # Array2D
 
-Array2D provides a fixed sized two-dimensional array. It is more
-efficient and is easier to use than nested vectors, i.e. `Vec<Vec<T>>`.
+Array2D provides a fixed sized two-dimensional array. It is more efficient and
+is easier to use than nested vectors, i.e. `Vec<Vec<T>>`.
 
 This is beneficial when using a grid-like structure, which is common in image
 processing, game boards, and other situations. Array2D cannot be used when rows
 or columns might have different lengths⁠—all rows and columns must be the same
 length.
 
-# How to use [`Array2D`]
+## How to use [`Array2D`]
 
-## Creating an [`Array2D`]
+### Creating an [`Array2D`]
 
-An [`Array2D`] can be created by either pre-filling it with a repeated value or
-by providing it with the data to create the array with. This can be done by:
+An [`Array2D`] can be created in many different ways. These include:
   - Providing the rows or the columns, which must all be the same size (see
     [`from_rows`] and [`from_columns`]).
   - Providing a "flat" slice of elements in either [row major or column major
     order] along with the dimensions, which must match the number of elements in
     the slice (see [`from_row_major`] and [`from_column_major`]).
+  - Providing a value to repeatedly fill every location (see [`filled_with`]).
+  - Providing a generator function that is repeatedly called to produce values
+    to fill the array (see [`filled_by_row_major`] and
+    [`filled_by_column_major`]).
+  - Providing an iterator that is used to produce values to fill the array (see
+    [`filled_by_iter_row_major`] and [`filled_by_column_major`]).
 
-## Accessing data from an [`Array2D`]
+### Accessing data from an [`Array2D`]
 
-[`Array2D`] supports indexing using a tuple of `(usize, usize)` (which
-panics on out-of-bounds accesses) or through the [`get`], [`get_mut`], and
-[`set`] methods (which return an [`Option`] or a [`Result`] on out-of-bounds
-accesses)
+[`Array2D`] supports indexing using a tuple of `(usize, usize)` (which panics on
+out-of-bounds accesses) or through the [`get`], [`get_mut`], and [`set`] methods
+(which return an [`Option`] or a [`Result`] on out-of-bounds accesses)
 
-[`Array2D`] also supports several forms of iteration. You can iterate
-through:
+[`Array2D`] also supports several forms of iteration. You can iterate through:
   - All of the elements, in either [row major or column major order] (see
     [`elements_row_major_iter`] and [`elements_column_major_iter`]).
   - Individual rows or columns (see [`row_iter`] and [`column_iter`]).
   - All rows or all columns (see [`rows_iter`] and [`columns_iter`]).
 
-## Extracting all data from an [`Array2D`]
+### Extracting all data from an [`Array2D`]
 
-An [`Array2D`] can be converted back into a [`Vec`] through several
-methods. You can extract the data as:
+An [`Array2D`] can be converted back into a [`Vec`] through several methods. You
+can extract the data as:
   - A [`Vec`] of rows or columns (see [`as_rows`] and [`as_columns`]).
   - A "flat" [`Vec`] of elements in either [row major or column major order]
     (see [`as_row_major`] and [`as_column_major`]).
 
-# Examples
+## Examples
 
-```rust
+```
 use array2d::Array2D;
 
 pub fn main() {
@@ -55,7 +58,7 @@ pub fn main() {
     assert_eq!(prefilled[(0, 0)], 42);
 
     // Create an array from the given rows. You can also use columns
-    // with the `from_columns` function
+    // with the `columns` function
     let rows = vec![vec![1, 2, 3], vec![4, 5, 6]];
     let from_rows = Array2D::from_rows(&rows);
     assert_eq!(from_rows.num_rows(), 2);
@@ -107,24 +110,29 @@ pub fn main() {
 }
 ```
 
-[`Array2D`]: https://docs.rs/array2d/latest/array2d/struct.Array2D.html
-[`from_rows`]: https://docs.rs/array2d/latest/array2d/struct.Array2D.html#method.from_rows
-[`from_columns`]: https://docs.rs/array2d/latest/array2d/struct.Array2D.html#method.from_columns
-[`from_row_major`]: https://docs.rs/array2d/latest/array2d/struct.Array2D.html#method.from_row_major
-[`from_column_major`]: https://docs.rs/array2d/latest/array2d/struct.Array2D.html#method.from_column_major
-[`get`]: https://docs.rs/array2d/latest/array2d/struct.Array2D.html#method.get
-[`get_mut`]: https://docs.rs/array2d/latest/array2d/struct.Array2D.html#method.get_mut
-[`set`]: https://docs.rs/array2d/latest/array2d/struct.Array2D.html#method.set
-[`elements_row_major_iter`]: https://docs.rs/array2d/latest/array2d/struct.Array2D.html#method.elements_row_major_iter
-[`elements_column_major_iter`]: https://docs.rs/array2d/latest/array2d/struct.Array2D.html#method.elements_column_major_iter
-[`row_iter`]: https://docs.rs/array2d/latest/array2d/struct.Array2D.html#method.row_iter
-[`column_iter`]: https://docs.rs/array2d/latest/array2d/struct.Array2D.html#method.column_iter
-[`rows_iter`]: https://docs.rs/array2d/latest/array2d/struct.Array2D.html#method.rows_iter
-[`columns_iter`]: https://docs.rs/array2d/latest/array2d/struct.Array2D.html#method.columns_iter
-[`as_rows`]: https://docs.rs/array2d/latest/array2d/struct.Array2D.html#method.as_rows
-[`as_columns`]: https://docs.rs/array2d/latest/array2d/struct.Array2D.html#method.as_columns
-[`as_row_major`]: https://docs.rs/array2d/latest/array2d/struct.Array2D.html#method.as_row_major
-[`as_column_major`]: https://docs.rs/array2d/latest/array2d/struct.Array2D.html#method.as_column_major
+[`Array2D`]: struct.Array2D.html
+[`filled_with`]: struct.Array2D.html#method.filled_with
+[`filled_by_row_major`]: struct.Array2D.html#method.filled_by_row_major
+[`filled_by_column_major`]: struct.Array2D.html#method.filled_by_column_major
+[`filled_by_iter_row_major`]: struct.Array2D.html#method.filled_by_iter_row_major
+[`filled_by_column_major`]: struct.Array2D.html#method.filled_by_column_major
+[`from_rows`]: struct.Array2D.html#method.from_rows
+[`from_columns`]: struct.Array2D.html#method.from_columns
+[`from_row_major`]: struct.Array2D.html#method.from_row_major
+[`from_column_major`]: struct.Array2D.html#method.from_column_major
+[`get`]: struct.Array2D.html#method.get
+[`get_mut`]: struct.Array2D.html#method.get_mut
+[`set`]: struct.Array2D.html#method.set
+[`elements_row_major_iter`]: struct.Array2D.html#method.elements_row_major_iter
+[`elements_column_major_iter`]: struct.Array2D.html#method.elements_column_major_iter
+[`row_iter`]: struct.Array2D.html#method.row_iter
+[`column_iter`]: struct.Array2D.html#method.column_iter
+[`rows_iter`]: struct.Array2D.html#method.rows_iter
+[`columns_iter`]: struct.Array2D.html#method.columns_iter
+[`as_rows`]: struct.Array2D.html#method.as_rows
+[`as_columns`]: struct.Array2D.html#method.as_columns
+[`as_row_major`]: struct.Array2D.html#method.as_row_major
+[`as_column_major`]: struct.Array2D.html#method.as_column_major
 [`Vec`]: https://doc.rust-lang.org/std/vec/struct.Vec.html
 [`Option`]: https://doc.rust-lang.org/std/option/
 [`Result`]: https://doc.rust-lang.org/std/result/
