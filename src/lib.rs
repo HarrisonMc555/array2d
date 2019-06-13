@@ -23,7 +23,7 @@
 //!     values to fill the array (see [`filled_by_row_major`] and
 //!     [`filled_by_column_major`]).
 //!   - Providing an iterator that is used to produce values to fill the array
-//!     (see [`filled_with_iter_row_major`] and [`filled_with_iter_column_major`]).
+//!     (see [`from_iter_row_major`] and [`from_iter_column_major`]).
 //!
 //! ## Accessing data from an [`Array2D`]
 //!
@@ -116,8 +116,8 @@
 //! [`filled_with`]: struct.Array2D.html#method.filled_with
 //! [`filled_by_row_major`]: struct.Array2D.html#method.filled_by_row_major
 //! [`filled_by_column_major`]: struct.Array2D.html#method.filled_by_column_major
-//! [`filled_with_iter_row_major`]: struct.Array2D.html#method.filled_by_iter_row_major
-//! [`filled_with_iter_column_major`]: struct.Array2D.html#method.filled_with_iter_column_major
+//! [`from_iter_row_major`]: struct.Array2D.html#method.from_iter_row_major
+//! [`from_iter_column_major`]: struct.Array2D.html#method.from_iter_column_major
 //! [`from_rows`]: struct.Array2D.html#method.from_rows
 //! [`from_columns`]: struct.Array2D.html#method.from_columns
 //! [`from_row_major`]: struct.Array2D.html#method.from_row_major
@@ -416,7 +416,7 @@ impl<T: Clone> Array2D<T> {
     /// ```
     /// # use array2d::Array2D;
     /// let iterator = (1..);
-    /// let array = Array2D::filled_with_iter_row_major(iterator, 2, 3);
+    /// let array = Array2D::from_iter_row_major(iterator, 2, 3);
     /// assert_eq!(array.as_rows(), vec![vec![1, 2, 3], vec![4, 5, 6]]);
     /// ```
     ///
@@ -426,7 +426,7 @@ impl<T: Clone> Array2D<T> {
     ///
     /// [`Array2D`]: struct.Array2D.html
     /// [row major order]: https://en.wikipedia.org/wiki/Row-_and_column-major_order
-    pub fn filled_with_iter_row_major<I>(iterator: I, num_rows: usize, num_columns: usize) -> Self
+    pub fn from_iter_row_major<I>(iterator: I, num_rows: usize, num_columns: usize) -> Self
     where
         I: Iterator<Item = T>,
     {
@@ -458,7 +458,7 @@ impl<T: Clone> Array2D<T> {
     /// ```
     /// # use array2d::Array2D;
     /// let iterator = (1..);
-    /// let array = Array2D::filled_with_iter_column_major(iterator, 2, 3);
+    /// let array = Array2D::from_iter_column_major(iterator, 2, 3);
     /// assert_eq!(array.as_rows(), vec![vec![1, 3, 5], vec![2, 4, 6]]);
     /// ```
     ///
@@ -468,7 +468,7 @@ impl<T: Clone> Array2D<T> {
     ///
     /// [`Array2D`]: struct.Array2D.html
     /// [column major order]: https://en.wikipedia.org/wiki/Row-_and_column-major_order
-    pub fn filled_with_iter_column_major<I>(iterator: I, num_rows: usize, num_columns: usize) -> Self
+    pub fn from_iter_column_major<I>(iterator: I, num_rows: usize, num_columns: usize) -> Self
     where
         I: Iterator<Item = T>,
     {
