@@ -1,21 +1,6 @@
 use array2d::Array2D;
 
 #[test]
-fn test_filled_with() {
-    let element = 7;
-    let array = Array2D::filled_with(element, 4, 5);
-    assert_eq!(array.num_rows(), 4);
-    assert_eq!(array.num_columns(), 5);
-    assert_eq!(array.num_elements(), 20);
-    for element in array.elements_row_major_iter() {
-        assert_eq!(element, &7);
-    }
-    for element in array.elements_column_major_iter() {
-        assert_eq!(element, &7);
-    }
-}
-
-#[test]
 fn test_from_rows() {
     let rows = vec![vec![1, 2, 3], vec![4, 5, 6]];
     let array = Array2D::from_rows(&rows);
@@ -55,6 +40,57 @@ fn test_from_column_major() {
             assert_eq!(array.get(row_index, column_index), Some(element));
         }
     }
+}
+
+#[test]
+fn test_filled_with() {
+    let element = 7;
+    let array = Array2D::filled_with(element, 4, 5);
+    assert_eq!(array.num_rows(), 4);
+    assert_eq!(array.num_columns(), 5);
+    assert_eq!(array.num_elements(), 20);
+    for element in array.elements_row_major_iter() {
+        assert_eq!(element, &7);
+    }
+    for element in array.elements_column_major_iter() {
+        assert_eq!(element, &7);
+    }
+}
+
+#[test]
+fn test_filled_by_row_major() {
+    let mut counter = 1;
+    let increment = || {
+        let tmp = counter;
+        counter += 1;
+        tmp
+    };
+    let array = Array2D::filled_by_row_major(increment, 2, 3);
+    assert_eq!(array.as_rows(), vec![vec![1, 2, 3], vec![4, 5, 6]]);
+}
+
+#[test]
+fn test_filled_by_column_major() {
+    let mut counter = 1;
+    let increment = || {
+        let tmp = counter;
+        counter += 1;
+        tmp
+    };
+    let array = Array2D::filled_by_column_major(increment, 2, 3);
+    assert_eq!(array.as_columns(), vec![vec![1, 2], vec![3, 4], vec![5, 6]]);
+}
+
+#[test]
+fn test_from_iter_row_major() {
+    let array = Array2D::from_iter_row_major(1.., 2, 3);
+    assert_eq!(array.as_rows(), vec![vec![1, 2, 3], vec![4, 5, 6]]);
+}
+
+#[test]
+fn test_from_iter_column_major() {
+    let array = Array2D::from_iter_column_major(1.., 2, 3);
+    assert_eq!(array.as_columns(), vec![vec![1, 2], vec![3, 4], vec![5, 6]]);
 }
 
 #[test]
@@ -120,63 +156,6 @@ fn test_set() {
         }
     }
 }
-
-// #[test]
-// fn test_get_rows() {
-//     let rows = vec![vec![1, 2, 3], vec![4, 5, 6]];
-//     let array = Array2D::from_rows(&rows);
-//     for row in 0..rows.len() {
-//         assert_eq!(array.get_row(row), rows[row].as_slice());
-//     }
-// }
-
-// #[test]
-// fn test_get_rows_mut() {
-//     let rows = vec![vec![1, 2, 3], vec![4, 5, 6]];
-//     let mut array = Array2D::from_rows(&rows);
-//     let row_index = 1;
-//     let row_elements = vec![7, 8, 9];
-//     let row_ref = array.get_row_mut(row_index);
-//     assert_eq!(row_ref, rows[row_index].as_slice());
-//     for (index, element) in row_ref.mut_iter().enumerate() {
-//         *element = row_elements[index];
-//     }
-//     for row in 0..rows.len() {
-//         let actual = array.get_row(row);
-//         if row == row_index {
-//             assert_eq!(actual, row_elements.as_slice());
-//         } else {
-//             assert_eq!(actual, rows[row].as_slice());
-//         }
-//     }
-// }
-
-// #[test]
-// fn test_set_rows() {
-//     let rows = vec![vec![1, 2, 3], vec![4, 5, 6]];
-//     let mut array = Array2D::from_rows(&rows);
-//     let row_index = 1;
-//     let row_elements = vec![7, 8, 9];
-//     array.set_row(1, &row_elements);
-//     for row in 0..rows.len() {
-//         let actual = array.get_row(row);
-//         if row == row_index {
-//             assert_eq!(actual, row_elements.as_slice());
-//         } else {
-//             assert_eq!(actual, rows[row].as_slice());
-//         }
-//     }
-// }
-
-// #[test]
-// fn test_rows_iter() {
-//     let rows = vec![vec![1, 2, 3], vec![4, 5, 6]];
-//     let array = Array2D::from_rows(&rows);
-//     for (index, row) in array.rows_iter().enumerate() {
-//         assert_eq!(row, rows[index].as_slice());
-//     }
-// }
-
 #[test]
 fn test_elements_row_major_iter() {
     let rows = vec![vec![1, 2, 3], vec![4, 5, 6]];
