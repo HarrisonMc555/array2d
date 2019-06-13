@@ -15,8 +15,9 @@
 //! by:
 //!   - Providing the rows or the columns, which must all be the same size (see
 //!     [`from_rows`] and [`from_columns`]).
-//!   - Providing a "flat" slice of elements along with the dimensions, which
-//!     must match the number of elements (see [`from_row_major`] and
+//!   - Providing a "flat" slice of elements in either [row major or column
+//!     major order] along with the dimensions, which must match the number of
+//!     elements in the slice (see [`from_row_major`] and
 //!     [`from_column_major`]).
 //!
 //! ## Accessing data from an [`Array2D`]
@@ -61,8 +62,8 @@
 //!     assert_eq!(from_rows.num_columns(), 3);
 //!     assert_eq!(from_rows[(1, 1)], 5);
 //!
-//!     // Create an array from a flat Vec of elements in row or column
-//!     // major order.
+//!     // Create an array from a flat Vec of elements in row major or
+//!     // column major order.
 //!     let column_major = vec![1, 4, 2, 5, 3, 6];
 //!     let from_column_major =
 //!         Array2D::from_column_major(&column_major, 2, 3);
