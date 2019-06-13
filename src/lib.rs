@@ -182,29 +182,25 @@ impl<T: Clone> Array2D<T> {
 
     /// Creates a new [`Array2D`] with the specified number of rows and columns
     /// and fills each element with the result of calling the given
-    /// function. The function is called once for every location, with no
-    /// guarantees on which order the elements are placed into the array.
+    /// function. The function is called once for every location.
+    ///
+    /// There are no guarantees on which order the elements are placed into the
+    /// array.
     ///
     /// # Examples
     ///
     /// ```
     /// # use array2d::Array2D;
-    /// let array = Array2D::filled_by_row_major(|| 42, 2, 3);
+    /// let array = Array2D::filled_by(|| 42, 2, 3);
     /// assert_eq!(array.as_rows(), vec![vec![42, 42, 42], vec![42, 42, 42]]);
     /// ```
     ///
     /// [`Array2D`]: struct.Array2D.html
-    pub fn filled_by<F>(mut generator: F, num_rows: usize, num_columns: usize) -> Self
+    pub fn filled_by<F>(generator: F, num_rows: usize, num_columns: usize) -> Self
     where
         F: FnMut() -> T,
     {
-        let total_len = num_rows * num_columns;
-        let array = (0..total_len).map(|_| generator()).collect();
-        Array2D {
-            array,
-            num_rows,
-            num_columns,
-        }
+        Array2D::filled_by_row_major(generator, num_rows, num_columns)
     }
 
     /// Creates a new [`Array2D`] with the specified number of rows and columns
@@ -264,10 +260,113 @@ impl<T: Clone> Array2D<T> {
     where
         F: FnMut() -> T,
     {
-        let columns = (0..num_columns)
-            .map(|_| (0..num_rows).map(|_| generator()).collect::<Vec<_>>())
-            .collect::<Vec<_>>();
-        Array2D::from_columns(&columns)
+        let total_len = num_rows * num_columns;
+        let array_column_major = (0..total_len).map(|_| generator()).collect::<Vec<_>>();
+        Array2D::from_column_major(&array_column_major, num_rows, num_columns)
+    }
+
+    /// Creates a new [`Array2D`] with the specified number of rows and columns
+    /// and fills each element with the elements produced from the provided
+    /// iterator. If the iterator produces more than enough elements, the
+    /// remaining are unused. Panics if the iterator does not produce enough
+    /// elements.
+    ///
+    /// There is no guarantee on what order the elements will appear in the
+    /// final array.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// # use array2d::Array2D;
+    /// let iterator = std::iter::repeat(42);
+    /// let array = Array2D::filled_by_iter(iterator, 2, 3);
+    /// assert_eq!(array.as_rows(), vec![vec![42, 42, 42], vec![42, 42, 42]]);
+    /// ```
+    ///
+    /// # Panics
+    ///
+    /// If the iterator provided does not produce enough elements.
+    ///
+    /// [`Array2D`]: struct.Array2D.html
+    pub fn filled_by_iter<I>(iterator: I, num_rows: usize, num_columns: usize) -> Self
+    where
+        I: Iterator<Item = T>,
+    {
+        Array2D::filled_by_iter_row_major(iterator, num_rows, num_columns)
+    }
+
+    /// Creates a new [`Array2D`] with the specified number of rows and columns
+    /// and fills each element with the elements produced from the provided
+    /// iterator. If the iterator produces more than enough elements, the
+    /// remaining are unused. Panics if the iterator does not produce enough
+    /// elements.
+    ///
+    /// The elements are inserted into the array in [row major order].
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// # use array2d::Array2D;
+    /// let iterator = (1..);
+    /// let array = Array2D::filled_by_iter(iterator, 2, 3);
+    /// assert_eq!(array.as_rows(), vec![vec![1, 2, 3], vec![4, 5, 6]]);
+    /// ```
+    ///
+    /// # Panics
+    ///
+    /// If the iterator provided does not produce enough elements.
+    ///
+    /// [`Array2D`]: struct.Array2D.html
+    /// [row major order]: https://en.wikipedia.org/wiki/Row-_and_column-major_order
+    pub fn filled_by_iter_row_major<I>(iterator: I, num_rows: usize, num_columns: usize) -> Self
+    where
+        I: Iterator<Item = T>,
+    {
+        let total_len = num_rows * num_columns;
+        let array = iterator.take(total_len).collect::<Vec<_>>();
+        if array.len() != total_len {
+            panic!(
+                "The provided iterator did not produce enough elements, {}",
+                total_len
+            );
+        }
+        Array2D {
+            array,
+            num_rows,
+            num_columns,
+        }
+    }
+
+    /// Creates a new [`Array2D`] with the specified number of rows and columns
+    /// and fills each element with the elements produced from the provided
+    /// iterator. If the iterator produces more than enough elements, the
+    /// remaining are unused. Panics if the iterator does not produce enough
+    /// elements.
+    ///
+    /// The elements are inserted into the array in [column major order].
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// # use array2d::Array2D;
+    /// let iterator = (1..);
+    /// let array = Array2D::filled_by_iter_column_major(iterator, 2, 3);
+    /// assert_eq!(array.as_rows(), vec![vec![1, 3, 5], vec![2, 4, 6]]);
+    /// ```
+    ///
+    /// # Panics
+    ///
+    /// If the iterator provided does not produce enough elements.
+    ///
+    /// [`Array2D`]: struct.Array2D.html
+    /// [column major order]: https://en.wikipedia.org/wiki/Row-_and_column-major_order
+    pub fn filled_by_iter_column_major<I>(iterator: I, num_rows: usize, num_columns: usize) -> Self
+    where
+        I: Iterator<Item = T>,
+    {
+        let total_len = num_rows * num_columns;
+        let array_column_major = iterator.take(total_len).collect::<Vec<_>>();
+        Array2D::from_column_major(&array_column_major, num_rows, num_columns)
     }
 
     /// Creates a new [`Array2D`] from a [`Vec`] of rows, each of which is a
