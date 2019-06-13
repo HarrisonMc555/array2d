@@ -1,0 +1,9 @@
+[package]
+name = "random"
+version = "0.1.0"
+authors = ["Harrison McCullough <mccullough.harrison@gmail.com>"]
+edition = "2018"
+
+[dependencies]
+array2d = { path = "../.." }
+rand = "0.6.5"

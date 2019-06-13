@@ -179,6 +179,96 @@ impl<T: Clone> Array2D<T> {
         Array2D::filled_with(element, num_rows, num_columns)
     }
 
+    /// Creates a new [`Array2D`] with the specified number of rows and columns
+    /// and fills each element with the result of calling the given
+    /// function. The function is called once for every location, with no
+    /// guarantees on which order the elements are placed into the array.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// # use array2d::Array2D;
+    /// let array = Array2D::filled_by_row_major(|| 42, 2, 3);
+    /// assert_eq!(array.as_rows(), vec![vec![42, 42, 42], vec![42, 42, 42]]);
+    /// ```
+    ///
+    /// [`Array2D`]: struct.Array2D.html
+    pub fn filled_by<F>(mut generator: F, num_rows: usize, num_columns: usize) -> Self
+    where
+        F: FnMut() -> T,
+    {
+        let total_len = num_rows * num_columns;
+        let array = (0..total_len).map(|_| generator()).collect();
+        Array2D {
+            array,
+            num_rows,
+            num_columns,
+        }
+    }
+
+    /// Creates a new [`Array2D`] with the specified number of rows and columns
+    /// and fills each element with the result of calling the given
+    /// function. The function is called once for every location going in
+    /// row major order.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// # use array2d::Array2D;
+    /// let mut counter = 1;
+    /// let increment = || {
+    ///     let tmp = counter;
+    ///     counter += 1;
+    ///     tmp
+    /// };
+    /// let array = Array2D::filled_by_row_major(increment, 2, 3);
+    /// assert_eq!(array.as_rows(), vec![vec![1, 2, 3], vec![4, 5, 6]]);
+    /// ```
+    ///
+    /// [`Array2D`]: struct.Array2D.html
+    pub fn filled_by_row_major<F>(mut generator: F, num_rows: usize, num_columns: usize) -> Self
+    where
+        F: FnMut() -> T,
+    {
+        let total_len = num_rows * num_columns;
+        let array = (0..total_len).map(|_| generator()).collect();
+        Array2D {
+            array,
+            num_rows,
+            num_columns,
+        }
+    }
+
+    /// Creates a new [`Array2D`] with the specified number of rows and columns
+    /// and fills each element with the result of calling the given
+    /// function. The function is called once for every location going in
+    /// column major order.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// # use array2d::Array2D;
+    /// let mut counter = 1;
+    /// let increment = || {
+    ///     let tmp = counter;
+    ///     counter += 1;
+    ///     tmp
+    /// };
+    /// let array = Array2D::filled_by_column_major(increment, 2, 3);
+    /// assert_eq!(array.as_columns(), vec![vec![1, 2], vec![3, 4], vec![5, 6]]);
+    /// ```
+    ///
+    /// [`Array2D`]: struct.Array2D.html
+    pub fn filled_by_column_major<F>(mut generator: F, num_rows: usize, num_columns: usize) -> Self
+    where
+        F: FnMut() -> T,
+    {
+        let columns = (0..num_columns)
+            .map(|_| (0..num_rows).map(|_| generator()).collect::<Vec<_>>())
+            .collect::<Vec<_>>();
+        Array2D::from_columns(&columns)
+    }
+
     /// Creates a new [`Array2D`] from a [`Vec`] of rows, each of which is a
     /// [`Vec`] of elements.
     ///
