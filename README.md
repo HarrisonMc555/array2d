@@ -1,12 +1,12 @@
 # Array2D
 
-Array2D provides a statically-sized two-dimensional array. It is more
+Array2D provides a fixed sized two-dimensional array. It is more
 efficient and is easier to use than nested vectors, i.e. `Vec<Vec<T>>`.
 
-This is beneficial when using a grid-like structure, which is common in
-image processing, game boards, and other situations. This cannot be
-used when rows or columns might have different lengths, as they are required
-to all be the same length.
+This is beneficial when using a grid-like structure, which is common in image
+processing, game boards, and other situations. Array2D cannot be used when rows
+or columns might have different lengths⁠—all rows and columns must be the same
+length.
 
 # How to use [`Array2D`]
 
@@ -50,7 +50,7 @@ use array2d::Array2D;
 
 pub fn main() {
     // Create an array filled with the same element.
-    let prefilled = Array2D::fill_with(42, 2, 3);
+    let prefilled = Array2D::filled_with(42, 2, 3);
     assert_eq!(prefilled.num_rows(), 2);
     assert_eq!(prefilled.num_columns(), 3);
     assert_eq!(prefilled[(0, 0)], 42);

@@ -1,10 +1,10 @@
-//! Array2D provides a statically-sized two-dimensional array. It is more
-//! efficient and is easier to use than nested vectors, i.e. `Vec<Vec<T>>`.
+//! Array2D provides a fixed sized two-dimensional array. It is more efficient
+//! and is easier to use than nested vectors, i.e. `Vec<Vec<T>>`.
 //!
 //! This is beneficial when using a grid-like structure, which is common in
-//! image processing, game boards, and other situations. This cannot be
-//! used when rows or columns might have different lengths, as they are required
-//! to all be the same length.
+//! image processing, game boards, and other situations. Array2D cannot be used
+//! when rows or columns might have different lengths⁠—all rows and columns must
+//! be the same length.
 //!
 //! # How to use [`Array2D`]
 //!
@@ -133,7 +133,7 @@
 
 use std::ops::{Index, IndexMut};
 
-/// A statically-sized two-dimensional array.
+/// A fixed sized two-dimensional array.
 #[derive(Debug, Eq, PartialEq)]
 pub struct Array2D<T: Clone> {
     array: Vec<T>,
