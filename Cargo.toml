@@ -9,3 +9,4 @@ license = "MIT"
 repository = "https://github.com/HarrisonMc555/array2d"
 
 [dependencies]
+serde = { version = "1.0", features = ["derive"], optional = true }

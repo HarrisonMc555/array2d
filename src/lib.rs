@@ -144,8 +144,12 @@
 
 use std::ops::{Index, IndexMut};
 
+#[cfg(feature = "serde")]
+use serde::{Serialize, Deserialize};
+
 /// A fixed sized two-dimensional array.
 #[derive(Debug, Eq, PartialEq)]
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 pub struct Array2D<T: Clone> {
     array: Vec<T>,
     num_rows: usize,
