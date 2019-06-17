@@ -674,7 +674,7 @@ impl<T: Clone> Array2D<T> {
     ///
     /// [`Iterator`]: https://doc.rust-lang.org/std/iter/trait.Iterator.html
     pub fn column_iter(&self, column_index: usize) -> impl Iterator<Item = &T> {
-        if column_index > self.num_columns {
+        if column_index >= self.num_columns {
             panic!(
                 "Column index, {}, was out of bounds (>= number of columns, {})",
                 column_index, self.num_columns,

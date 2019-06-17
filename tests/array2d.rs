@@ -292,6 +292,104 @@ fn test_from_column_major_dimensions_do_not_match_size() {
 }
 
 #[test]
+#[should_panic]
+fn test_from_iter_row_major_not_enough() {
+    let iter = 1..5;
+    let num_rows = 2;
+    let num_columns = 3;
+    Array2D::from_iter_row_major(iter, num_rows, num_columns);
+}
+
+#[test]
+#[should_panic]
+fn test_from_iter_column_major_not_enough() {
+    let iter = 1..5;
+    let num_rows = 2;
+    let num_columns = 3;
+    Array2D::from_iter_column_major(iter, num_rows, num_columns);
+}
+
+#[test]
+#[should_panic]
+fn test_row_iter_out_of_bounds() {
+    let element = 42;
+    let num_rows = 2;
+    let num_columns = 3;
+    let array = Array2D::filled_with(element, num_rows, num_columns);
+    let _ = array.row_iter(num_rows);
+}
+
+#[test]
+#[should_panic]
+fn test_column_iter_out_of_bounds() {
+    let element = 42;
+    let num_rows = 2;
+    let num_columns = 3;
+    let array = Array2D::filled_with(element, num_rows, num_columns);
+    let _ = array.column_iter(num_columns);
+}
+
+#[test]
+#[should_panic]
+fn test_index_out_of_bounds_row() {
+    let element = 42;
+    let num_rows = 2;
+    let num_columns = 3;
+    let array = Array2D::filled_with(element, num_rows, num_columns);
+    let _ = array[(num_rows, 0)];
+}
+
+#[test]
+#[should_panic]
+fn test_index_out_of_bounds_column() {
+    let element = 42;
+    let num_rows = 2;
+    let num_columns = 3;
+    let array = Array2D::filled_with(element, num_rows, num_columns);
+    let _ = array[(0, num_columns)];
+}
+
+#[test]
+#[should_panic]
+fn test_index_out_of_bounds_row_and_column() {
+    let element = 42;
+    let num_rows = 2;
+    let num_columns = 3;
+    let array = Array2D::filled_with(element, num_rows, num_columns);
+    let _ = array[(num_rows, num_columns)];
+}
+
+#[test]
+#[should_panic]
+fn test_index_mut_out_of_bounds_row() {
+    let element = 42;
+    let num_rows = 2;
+    let num_columns = 3;
+    let mut array = Array2D::filled_with(element, num_rows, num_columns);
+    array[(num_rows, 0)] += 1;
+}
+
+#[test]
+#[should_panic]
+fn test_index_mut_out_of_bounds_column() {
+    let element = 42;
+    let num_rows = 2;
+    let num_columns = 3;
+    let mut array = Array2D::filled_with(element, num_rows, num_columns);
+    array[(0, num_columns)] += 1;
+}
+
+#[test]
+#[should_panic]
+fn test_index_mut_out_of_bounds_row_and_column() {
+    let element = 42;
+    let num_rows = 2;
+    let num_columns = 3;
+    let mut array = Array2D::filled_with(element, num_rows, num_columns);
+    array[(num_rows, num_columns)] += 1;
+}
+
+#[test]
 fn test_empty_array_from_rows() {
     let rows: Vec<Vec<i32>> = vec![];
     let array = Array2D::from_rows(&rows);
