@@ -145,7 +145,7 @@
 use std::ops::{Index, IndexMut};
 
 #[cfg(feature = "serde")]
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 
 /// A fixed sized two-dimensional array.
 #[derive(Debug, Clone, Eq, PartialEq)]
