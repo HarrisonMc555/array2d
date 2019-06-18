@@ -50,7 +50,7 @@
 //!
 //! # Examples
 //!
-//! ```
+//! ```rust
 //! use array2d::Array2D;
 //!
 //! pub fn main() {
