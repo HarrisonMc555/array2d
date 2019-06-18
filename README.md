@@ -1,3 +1,5 @@
+# array2d
+
 Array2D provides a fixed sized two-dimensional array. It is more efficient
 and is easier to use than nested vectors, i.e. `Vec<Vec<T>>`.
 
@@ -6,9 +8,9 @@ image processing, game boards, and other situations. Array2D cannot be used
 when rows or columns might have different lengths⁠—all rows and columns must
 be the same length.
 
-# How to use [`Array2D`]
+## How to use [`Array2D`]
 
-## Creating an [`Array2D`]
+### Creating an [`Array2D`]
 
 An [`Array2D`] can be created in many different ways. These include:
   - Providing the rows or the columns, which must all be the same size (see
@@ -25,7 +27,7 @@ An [`Array2D`] can be created in many different ways. These include:
   - Providing an iterator that is used to produce values to fill the array
     (see [`from_iter_row_major`] and [`from_iter_column_major`]).
 
-## Accessing data from an [`Array2D`]
+### Accessing data from an [`Array2D`]
 
 [`Array2D`] supports two forms of indexing, much like a [`Vec`]:
   - Using the indexing syntax (square brackets) with a tuple of `(usize,
@@ -40,7 +42,7 @@ through:
   - Individual rows or columns (see [`row_iter`] and [`column_iter`]).
   - All rows or all columns (see [`rows_iter`] and [`columns_iter`]).
 
-## Extracting all data from an [`Array2D`]
+### Extracting all data from an [`Array2D`]
 
 An [`Array2D`] can be converted back into a [`Vec`] through several
 methods. You can extract the data as:
@@ -48,7 +50,7 @@ methods. You can extract the data as:
   - A "flat" [`Vec`] of elements in either [row major or column major order]
     (see [`as_row_major`] and [`as_column_major`]).
 
-# Examples
+## Examples
 
 ```rust
 use array2d::Array2D;
@@ -140,3 +142,5 @@ pub fn main() {
 [`Option`]: https://doc.rust-lang.org/std/option/
 [`Result`]: https://doc.rust-lang.org/std/result/
 [row major or column major order]: https://en.wikipedia.org/wiki/Row-_and_column-major_order
+
+License: MIT
