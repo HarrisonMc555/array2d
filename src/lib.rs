@@ -17,7 +17,7 @@
 //!     major order] along with the dimensions, which must match the number of
 //!     elements in the slice (see [`from_row_major`] and
 //!     [`from_column_major`]).
-//!   - Providing a value to repeatedly fill every location (see
+//!   - Providing a value to repeatedly put in every location (see
 //!     [`filled_with`]).
 //!   - Providing a generator function that is repeatedly called to produce
 //!     values to fill the array (see [`filled_by_row_major`] and
@@ -27,10 +27,11 @@
 //!
 //! ## Accessing data from an [`Array2D`]
 //!
-//! [`Array2D`] supports indexing using a tuple of `(usize, usize)` (which
-//! panics on out-of-bounds accesses) or through the [`get`], [`get_mut`], and
-//! [`set`] methods (which return an [`Option`] or a [`Result`] on out-of-bounds
-//! accesses)
+//! [`Array2D`] supports two forms of indexing, much like a [`Vec`]:
+//!   - Using the indexing syntax (square brackets) with a tuple of `(usize,
+//!     usize)`, which panics on out-of-bounds accesses.
+//!   - Using the [`get`], [`get_mut`], and [`set`] methods, which return an
+//!     [`Option`] or a [`Result`] on out-of-bounds accesses.
 //!
 //! [`Array2D`] also supports several forms of iteration. You can iterate
 //! through:
@@ -113,15 +114,15 @@
 //! ```
 //!
 //! [`Array2D`]: struct.Array2D.html
+//! [`from_rows`]: struct.Array2D.html#method.from_rows
+//! [`from_columns`]: struct.Array2D.html#method.from_columns
+//! [`from_row_major`]: struct.Array2D.html#method.from_row_major
+//! [`from_column_major`]: struct.Array2D.html#method.from_column_major
 //! [`filled_with`]: struct.Array2D.html#method.filled_with
 //! [`filled_by_row_major`]: struct.Array2D.html#method.filled_by_row_major
 //! [`filled_by_column_major`]: struct.Array2D.html#method.filled_by_column_major
 //! [`from_iter_row_major`]: struct.Array2D.html#method.from_iter_row_major
 //! [`from_iter_column_major`]: struct.Array2D.html#method.from_iter_column_major
-//! [`from_rows`]: struct.Array2D.html#method.from_rows
-//! [`from_columns`]: struct.Array2D.html#method.from_columns
-//! [`from_row_major`]: struct.Array2D.html#method.from_row_major
-//! [`from_column_major`]: struct.Array2D.html#method.from_column_major
 //! [`get`]: struct.Array2D.html#method.get
 //! [`get_mut`]: struct.Array2D.html#method.get_mut
 //! [`set`]: struct.Array2D.html#method.set
@@ -340,7 +341,7 @@ impl<T: Clone> Array2D<T> {
     }
 
     #[deprecated(since = "0.2.0", note = "Renamed to filled_with")]
-    /// Renamed to filled_with
+    /// Renamed to filled_with.
     pub fn fill_with(element: T, num_rows: usize, num_columns: usize) -> Self {
         Array2D::filled_with(element, num_rows, num_columns)
     }
