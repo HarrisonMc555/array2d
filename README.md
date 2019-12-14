@@ -1,7 +1,7 @@
 # array2d
 
 Array2D provides a fixed sized two-dimensional array. It is more efficient
-and is easier to use than nested vectors, i.e. `Vec<Vec<T>>`.
+and is easier to use than a vector of vectors, i.e. `Vec<Vec<T>>`.
 
 This is beneficial when using a grid-like structure, which is common in
 image processing, game boards, and other situations. Array2D cannot be used
@@ -29,11 +29,16 @@ An [`Array2D`] can be created in many different ways. These include:
 
 ### Accessing data from an [`Array2D`]
 
-[`Array2D`] supports two forms of indexing, much like a [`Vec`]:
-  - Using the indexing syntax (square brackets) with a tuple of `(usize,
-    usize)`, which panics on out-of-bounds accesses.
+[`Array2D`] supports several forms of indexing:
+  - Using the indexing syntax (square brackets) with a tuple of [`(usize,
+    usize)`], which panics on out-of-bounds accesses.
   - Using the [`get`], [`get_mut`], and [`set`] methods, which return an
     [`Option`] or a [`Result`] on out-of-bounds accesses.
+  - Using the row major or column major version of these methods,
+    i.e. [`get_row_major`], [`get_mut_row_major`], [`set_row_major`],
+    [`get_column_major`], [`get_mut_column_major`],
+    [`set_column_major`]. These perform the same tasks as the non row/column
+    major methods, but take one index instead of two.
 
 [`Array2D`] also supports several forms of iteration. You can iterate
 through:
@@ -53,9 +58,9 @@ methods. You can extract the data as:
 ## Examples
 
 ```rust
-use array2d::Array2D;
+use array2d::{Array2D, Error};
 
-pub fn main() {
+pub fn main() -> Result<(), Error> {
     // Create an array filled with the same element.
     let prefilled = Array2D::filled_with(42, 2, 3);
     assert_eq!(prefilled.num_rows(), 2);
@@ -65,7 +70,7 @@ pub fn main() {
     // Create an array from the given rows. You can also use columns
     // with the `columns` function
     let rows = vec![vec![1, 2, 3], vec![4, 5, 6]];
-    let from_rows = Array2D::from_rows(&rows);
+    let from_rows = Array2D::from_rows(&rows)?;
     assert_eq!(from_rows.num_rows(), 2);
     assert_eq!(from_rows.num_columns(), 3);
     assert_eq!(from_rows[(1, 1)], 5);
@@ -74,7 +79,7 @@ pub fn main() {
     // column major order.
     let column_major = vec![1, 4, 2, 5, 3, 6];
     let from_column_major =
-        Array2D::from_column_major(&column_major, 2, 3);
+        Array2D::from_column_major(&column_major, 2, 3)?;
     assert_eq!(from_column_major.num_rows(), 2);
     assert_eq!(from_column_major.num_columns(), 3);
     assert_eq!(from_column_major[(1, 1)], 5);
@@ -85,7 +90,7 @@ pub fn main() {
     // Index into an array using a tuple of usize to access or alter
     // the array.
     let rows = vec![vec![1, 2, 3], vec![4, 5, 6]];
-    let mut array = Array2D::from_rows(&rows);
+    let mut array = Array2D::from_rows(&rows)?;
     array[(1, 1)] = 100;
 
     // Convert the array back into a nested Vec using `as_rows` or
@@ -100,7 +105,7 @@ pub fn main() {
 
     // Iterate over a single row or column
     println!("First column:");
-    for element in array.column_iter(0) {
+    for element in array.column_iter(0)? {
         println!("{}", element);
     }
 
@@ -112,7 +117,10 @@ pub fn main() {
         }
         println!();
     }
+
+    Ok(())
 }
+
 ```
 
 [`Array2D`]: struct.Array2D.html
@@ -141,6 +149,7 @@ pub fn main() {
 [`Vec`]: https://doc.rust-lang.org/std/vec/struct.Vec.html
 [`Option`]: https://doc.rust-lang.org/std/option/
 [`Result`]: https://doc.rust-lang.org/std/result/
+[`(usize, usize)`]: https://doc.rust-lang.org/std/primitive.usize.html
 [row major or column major order]: https://en.wikipedia.org/wiki/Row-_and_column-major_order
 
 License: MIT
