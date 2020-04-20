@@ -519,7 +519,6 @@ fn test_index_mut_out_of_bounds_row_and_column() {
     array[(num_rows, num_columns)] += 1;
 }
 
-
 ////////////////////////////////////////////////////////////////////////////////
 // Empty Arrays ////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
@@ -565,5 +564,79 @@ fn test_empty_array_from_row_major_non_zero_columns() -> Result<(), Error> {
     assert_eq!(array.num_columns(), 4);
     assert_eq!(array.row_len(), 4);
     assert_eq!(array.column_len(), 0);
+    Ok(())
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// Double-Ended Iterators //////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+
+#[test]
+fn test_double_ended_iterator_elements_row_major_iter() -> Result<(), Error> {
+    let rows = vec![vec![1, 2, 3], vec![4, 5, 6]];
+    let array = Array2D::from_rows(&rows)?;
+    let reversed_columns = array
+        .elements_row_major_iter()
+        .cloned()
+        .rev()
+        .collect::<Vec<_>>();
+    assert_eq!(reversed_columns, vec![6, 5, 4, 3, 2, 1]);
+    Ok(())
+}
+
+#[test]
+fn test_double_ended_iterator_elements_column_major_iter() -> Result<(), Error> {
+    let rows = vec![vec![1, 2, 3], vec![4, 5, 6]];
+    let array = Array2D::from_rows(&rows)?;
+    let reversed_columns = array
+        .elements_column_major_iter()
+        .cloned()
+        .rev()
+        .collect::<Vec<_>>();
+    assert_eq!(reversed_columns, vec![6, 3, 5, 2, 4, 1]);
+    Ok(())
+}
+
+#[test]
+fn test_double_ended_iterator_row_iter() -> Result<(), Error> {
+    let rows = vec![vec![1, 2, 3], vec![4, 5, 6]];
+    let array = Array2D::from_rows(&rows)?;
+    let reversed_columns = array.row_iter(0)?.cloned().rev().collect::<Vec<_>>();
+    assert_eq!(reversed_columns, vec![3, 2, 1]);
+    Ok(())
+}
+
+#[test]
+fn test_double_ended_iterator_column_iter() -> Result<(), Error> {
+    let rows = vec![vec![1, 2, 3], vec![4, 5, 6]];
+    let array = Array2D::from_rows(&rows)?;
+    let reversed_columns = array.column_iter(1)?.cloned().rev().collect::<Vec<_>>();
+    assert_eq!(reversed_columns, vec![5, 2]);
+    Ok(())
+}
+
+#[test]
+fn test_double_ended_iterator_rows_iter() -> Result<(), Error> {
+    let rows = vec![vec![1, 2, 3], vec![4, 5, 6]];
+    let array = Array2D::from_rows(&rows)?;
+    let reversed_rows = array
+        .rows_iter()
+        .rev()
+        .map(|row| row.cloned().collect::<Vec<_>>())
+        .collect::<Vec<_>>();
+    assert_eq!(reversed_rows, vec![vec![4, 5, 6], vec![1, 2, 3]]);
+    Ok(())
+}
+
+#[test]
+fn test_double_ended_iterator_columns_iter() -> Result<(), Error> {
+    let rows = vec![vec![1, 2, 3], vec![4, 5, 6]];
+    let array = Array2D::from_rows(&rows)?;
+    let reversed_columns = array
+        .columns_iter()
+        .rev()
+        .map(|row| row.cloned().collect::<Vec<_>>())
+        .collect::<Vec<_>>();
+    assert_eq!(reversed_columns, vec![vec![3, 6], vec![2, 5], vec![1, 4]]);
     Ok(())
 }
