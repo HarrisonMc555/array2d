@@ -725,8 +725,10 @@ impl<T> Array2D<T> {
     /// [`Err`]: https://doc.rust-lang.org/std/result/enum.Result.html#variant.Err
     /// [`array2d::Error`]: enum.Error.html
     pub fn set(&mut self, row: usize, column: usize, element: T) -> Result<(), Error> {
-        self.get_index(row, column)
-            .map(|index| self.array[index] = element)
+        self.get_mut(row, column)
+            .map(|location| {
+                *location = element;
+            })
             .ok_or_else(|| Error::IndicesOutOfBounds(row, column))
     }
 
@@ -809,7 +811,7 @@ impl<T> Array2D<T> {
     ///
     /// [`Iterator`]: https://doc.rust-lang.org/std/iter/trait.Iterator.html
     /// [row major order]: https://en.wikipedia.org/wiki/Row-_and_column-major_order
-    pub fn elements_row_major_iter(&self) -> impl Iterator<Item = &T> {
+    pub fn elements_row_major_iter(&self) -> impl DoubleEndedIterator<Item = &T> {
         self.array.iter()
     }
 
@@ -832,7 +834,7 @@ impl<T> Array2D<T> {
     ///
     /// [`Iterator`]: https://doc.rust-lang.org/std/iter/trait.Iterator.html
     /// [column major order]: https://en.wikipedia.org/wiki/Row-_and_column-major_order
-    pub fn elements_column_major_iter(&self) -> impl Iterator<Item = &T> {
+    pub fn elements_column_major_iter(&self) -> impl DoubleEndedIterator<Item = &T> {
         (0..self.num_columns)
             .flat_map(move |column| (0..self.num_rows).map(move |row| &self[(row, column)]))
     }
@@ -857,7 +859,7 @@ impl<T> Array2D<T> {
     /// ```
     ///
     /// [`Iterator`]: https://doc.rust-lang.org/std/iter/trait.Iterator.html
-    pub fn row_iter(&self, row_index: usize) -> Result<impl Iterator<Item = &T>, Error> {
+    pub fn row_iter(&self, row_index: usize) -> Result<impl DoubleEndedIterator<Item = &T>, Error> {
         let start = self
             .get_index(row_index, 0)
             .ok_or(Error::IndicesOutOfBounds(row_index, 0))?;
@@ -884,7 +886,10 @@ impl<T> Array2D<T> {
     /// ```
     ///
     /// [`Iterator`]: https://doc.rust-lang.org/std/iter/trait.Iterator.html
-    pub fn column_iter(&self, column_index: usize) -> Result<impl Iterator<Item = &T>, Error> {
+    pub fn column_iter(
+        &self,
+        column_index: usize,
+    ) -> Result<impl DoubleEndedIterator<Item = &T>, Error> {
         if column_index >= self.num_columns {
             return Err(Error::IndicesOutOfBounds(0, column_index));
         }
@@ -929,7 +934,9 @@ impl<T> Array2D<T> {
     ///
     /// [`Iterator`]: https://doc.rust-lang.org/std/iter/trait.Iterator.html
     /// [`Item`]: https://doc.rust-lang.org/std/iter/trait.Iterator.html#associatedtype.Item
-    pub fn rows_iter(&self) -> impl Iterator<Item = impl Iterator<Item = &T>> {
+    pub fn rows_iter(
+        &self,
+    ) -> impl DoubleEndedIterator<Item = impl DoubleEndedIterator<Item = &T>> {
         (0..self.num_rows()).map(move |row_index| {
             self.row_iter(row_index)
                 .expect("rows_iter should never fail")
@@ -977,7 +984,9 @@ impl<T> Array2D<T> {
     ///
     /// [`Iterator`]: https://doc.rust-lang.org/std/iter/trait.Iterator.html
     /// [`Item`]: https://doc.rust-lang.org/std/iter/trait.Iterator.html#associatedtype.Item
-    pub fn columns_iter(&self) -> impl Iterator<Item = impl Iterator<Item = &T>> {
+    pub fn columns_iter(
+        &self,
+    ) -> impl DoubleEndedIterator<Item = impl DoubleEndedIterator<Item = &T>> {
         (0..self.num_columns).map(move |column_index| {
             self.column_iter(column_index)
                 .expect("columns_iter should never fail")
@@ -1119,7 +1128,7 @@ impl<T> Index<(usize, usize)> for Array2D<T> {
     /// ```
     fn index(&self, (row, column): (usize, usize)) -> &Self::Output {
         self.get(row, column)
-            .expect(&format!("Index indices {}, {} out of bounds", row, column))
+            .unwrap_or_else(|| panic!("Index indices {}, {} out of bounds", row, column))
     }
 }
 
@@ -1146,10 +1155,8 @@ impl<T> IndexMut<(usize, usize)> for Array2D<T> {
     /// array[(10, 10)] = 7;
     /// ```
     fn index_mut(&mut self, (row, column): (usize, usize)) -> &mut Self::Output {
-        self.get_mut(row, column).expect(&format!(
-            "Index mut indices {}, {} out of bounds",
-            row, column
-        ))
+        self.get_mut(row, column)
+            .unwrap_or_else(|| panic!("Index mut indices {}, {} out of bounds", row, column))
     }
 }
 
