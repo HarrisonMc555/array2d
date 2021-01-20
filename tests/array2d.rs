@@ -640,3 +640,64 @@ fn test_double_ended_iterator_columns_iter() -> Result<(), Error> {
     assert_eq!(reversed_columns, vec![vec![3, 6], vec![2, 5], vec![1, 4]]);
     Ok(())
 }
+
+#[test]
+fn test_indices_row_major() -> Result<(), Error> {
+    let rows = vec![vec![1, 2, 3], vec![4, 5, 6]];
+    let array = Array2D::from_rows(&rows)?;
+    let indices_row_major = array.indices_row_major().collect::<Vec<_>>();
+    assert_eq!(
+        indices_row_major,
+        vec![(0, 0), (0, 1), (0, 2), (1, 0), (1, 1), (1, 2)]
+    );
+    Ok(())
+}
+
+#[test]
+fn test_indices_column_major() -> Result<(), Error> {
+    let rows = vec![vec![1, 2, 3], vec![4, 5, 6]];
+    let array = Array2D::from_rows(&rows)?;
+    let indices_column_major = array.indices_column_major().collect::<Vec<_>>();
+    assert_eq!(
+        indices_column_major,
+        vec![(0, 0), (1, 0), (0, 1), (1, 1), (0, 2), (1, 2)]
+    );
+    Ok(())
+}
+
+#[test]
+fn test_enumerate_row_major() -> Result<(), Error> {
+    let rows = vec![vec![1, 2, 3], vec![4, 5, 6]];
+    let array = Array2D::from_rows(&rows)?;
+    let enumerate_row_major = array.enumerate_row_major().collect::<Vec<_>>();
+    assert_eq!(
+        enumerate_row_major,
+        vec![
+            ((0, 0), &1),
+            ((0, 1), &2),
+            ((0, 2), &3),
+            ((1, 0), &4),
+            ((1, 1), &5),
+            ((1, 2), &6)
+        ]
+    );
+    Ok(())
+}
+
+fn main() -> Result<(), Error> {
+    let rows = vec![vec![1, 2, 3], vec![4, 5, 6]];
+    let array = Array2D::from_rows(&rows)?;
+    let enumerate_column_major = array.enumerate_column_major().collect::<Vec<_>>();
+    assert_eq!(
+        enumerate_column_major,
+        vec![
+            ((0, 0), &1),
+            ((1, 0), &4),
+            ((0, 1), &2),
+            ((1, 1), &5),
+            ((0, 2), &3),
+            ((1, 2), &6)
+        ]
+    );
+    Ok(())
+}
