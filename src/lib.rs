@@ -247,9 +247,7 @@ impl<T> Array2D<T> {
         }
         let num_rows = column_len;
         let num_columns = elements.len();
-        let indices_row_major =
-            (0..num_rows).flat_map(move |row| (0..num_columns).map(move |column| (row, column)));
-        let array = indices_row_major
+        let array = indices_row_major(num_rows, num_columns)
             .map(|(row, column)| elements[column][row].clone())
             .collect();
         Ok(Array2D {
@@ -1095,6 +1093,108 @@ impl<T> Array2D<T> {
         self.elements_column_major_iter().cloned().collect()
     }
 
+    /// Returns the indices of the array in row major order. Each index is a tuple of [`usize`].
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// # use array2d::{Array2D, Error};
+    /// # fn main() -> Result<(), Error> {
+    /// let rows = vec![vec![1, 2, 3], vec![4, 5, 6]];
+    /// let array = Array2D::from_rows(&rows)?;
+    /// let indices_row_major = array.indices_row_major().collect::<Vec<_>>();
+    /// assert_eq!(
+    ///     indices_row_major,
+    ///     vec![(0, 0), (0, 1), (0, 2), (1, 0), (1, 1), (1, 2)]
+    /// );
+    /// # Ok(())
+    /// # }
+    /// ```
+    ///
+    /// [`usize`]: https://doc.rust-lang.org/std/primitive.usize.html
+    pub fn indices_row_major(&self) -> impl DoubleEndedIterator<Item = (usize, usize)> {
+        indices_row_major(self.num_rows, self.num_columns)
+    }
+
+    /// Returns the indices of the array in column major order. Each index is a tuple of [`usize`].
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// # use array2d::{Array2D, Error};
+    /// # fn main() -> Result<(), Error> {
+    /// let rows = vec![vec![1, 2, 3], vec![4, 5, 6]];
+    /// let array = Array2D::from_rows(&rows)?;
+    /// let indices_column_major = array.indices_column_major().collect::<Vec<_>>();
+    /// assert_eq!(
+    ///     indices_column_major,
+    ///     vec![(0, 0), (1, 0), (0, 1), (1, 1), (0, 2), (1, 2)]
+    /// );
+    /// # Ok(())
+    /// # }
+    /// ```
+    ///
+    /// [`usize`]: https://doc.rust-lang.org/std/primitive.usize.html
+    pub fn indices_column_major(&self) -> impl DoubleEndedIterator<Item = (usize, usize)> {
+        indices_column_major(self.num_rows, self.num_columns)
+    }
+
+    /// Iterate through the array in row major order along with the corresponding indices. Each
+    /// index is a tuple of [`usize`].
+    ///
+    /// # Examples
+    /// # use array2d::{Array2D, Error};
+    /// # fn main() -> Result<(), Error> {
+    /// let rows = vec![vec![1, 2, 3], vec![4, 5, 6]];
+    /// let array = Array2D::from_rows(&rows)?;
+    /// let enumerate_row_major = array.enumerate_row_major().collect::<Vec<_>>();
+    /// assert_eq!(
+    ///     enumerate_row_major,
+    ///     vec![
+    ///         ((0, 0), &1),
+    ///         ((0, 1), &2),
+    ///         ((0, 2), &3),
+    ///         ((1, 0), &4),
+    ///         ((1, 1), &5),
+    ///         ((1, 2), &6)
+    ///     ]
+    /// );
+    /// # Ok(())
+    /// # }
+    ///
+    /// [`usize`]: https://doc.rust-lang.org/std/primitive.usize.html
+    pub fn enumerate_row_major(&self) -> impl DoubleEndedIterator<Item = ((usize, usize), &T)> {
+        self.indices_row_major().map(move |i| (i, &self[i]))
+    }
+
+    /// Iterate through the array in column major order along with the corresponding indices. Each
+    /// index is a tuple of [`usize`].
+    ///
+    /// # Examples
+    /// # use array2d::{Array2D, Error};
+    /// # fn main() -> Result<(), Error> {
+    /// let rows = vec![vec![1, 2, 3], vec![4, 5, 6]];
+    /// let array = Array2D::from_rows(&rows)?;
+    /// let enumerate_column_major = array.enumerate_column_major().collect::<Vec<_>>();
+    /// assert_eq!(
+    ///     enumerate_column_major,
+    ///     vec![
+    ///         ((0, 0), &1),
+    ///         ((1, 0), &4),
+    ///         ((0, 1), &2),
+    ///         ((1, 1), &5),
+    ///         ((0, 2), &3),
+    ///         ((1, 2), &6)
+    ///     ]
+    /// );
+    /// # Ok(())
+    /// # }
+    ///
+    /// [`usize`]: https://doc.rust-lang.org/std/primitive.usize.html
+    pub fn enumerate_column_major(&self) -> impl DoubleEndedIterator<Item = ((usize, usize), &T)> {
+        self.indices_column_major().map(move |i| (i, &self[i]))
+    }
+
     fn get_index(&self, row: usize, column: usize) -> Option<usize> {
         if row < self.num_rows && column < self.num_columns {
             Some(row * self.row_len() + column)
@@ -1162,4 +1262,18 @@ impl<T> IndexMut<(usize, usize)> for Array2D<T> {
 
 fn flatten<T: Clone>(nested: &[Vec<T>]) -> Vec<T> {
     nested.iter().flat_map(|row| row.clone()).collect()
+}
+
+fn indices_row_major(
+    num_rows: usize,
+    num_columns: usize,
+) -> impl DoubleEndedIterator<Item = (usize, usize)> {
+    (0..num_rows).flat_map(move |row| (0..num_columns).map(move |column| (row, column)))
+}
+
+fn indices_column_major(
+    num_rows: usize,
+    num_columns: usize,
+) -> impl DoubleEndedIterator<Item = (usize, usize)> {
+    (0..num_columns).flat_map(move |column| (0..num_rows).map(move |row| (row, column)))
 }
