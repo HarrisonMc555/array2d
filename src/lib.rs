@@ -158,7 +158,7 @@ use std::ops::{Index, IndexMut};
 use serde::{Deserialize, Serialize};
 
 /// A fixed sized two-dimensional array.
-#[derive(Debug, Clone, Eq, PartialEq)]
+#[derive(Debug, Clone, Eq, PartialEq, Hash)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 pub struct Array2D<T> {
     array: Vec<T>,
