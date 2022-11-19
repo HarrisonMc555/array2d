@@ -322,6 +322,23 @@ fn test_row_iter() -> Result<(), Error> {
 }
 
 #[test]
+fn test_row_iter_mut() -> Result<(), Error> {
+    let rows = vec![vec![1, 2, 3], vec![4, 5, 6]];
+    let mut array = Array2D::from_rows(&rows)?;
+    let first_row_iter = array.row_iter_mut(0)?;
+    for (index, element) in first_row_iter.enumerate() {
+        *element += 1;
+        assert_eq!(*element, &rows[0][index] + 1);
+    }
+    let second_row_iter = array.row_iter_mut(1)?;
+    for (index, element) in second_row_iter.enumerate() {
+        *element += 1;
+        assert_eq!(*element, &rows[1][index] + 1);
+    }
+    Ok(())
+}
+
+#[test]
 fn test_column_iter() -> Result<(), Error> {
     let rows = vec![vec![1, 2, 3], vec![4, 5, 6]];
     let array = Array2D::from_rows(&rows)?;

@@ -865,6 +865,37 @@ impl<T> Array2D<T> {
         Ok(self.array[start..end].iter())
     }
 
+    /// Returns an [`Iterator`] over mutable references to all elements in the given
+    /// row. Returns an error if the index is out of bounds.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// # use array2d::{Array2D, Error};
+    /// # fn main() -> Result<(), Error> {
+    /// let rows = vec![vec![1, 2, 3], vec![4, 5, 6]];
+    /// let mut array = Array2D::from_rows(&rows)?;
+    /// let mut row_iter = array.row_iter_mut(1)?;
+    /// assert_eq!(row_iter.next(), Some(&mut 4));
+    /// assert_eq!(row_iter.next(), Some(&mut 5));
+    /// assert_eq!(row_iter.next(), Some(&mut 6));
+    /// assert_eq!(row_iter.next(), None);
+    /// # Ok(())
+    /// # }
+    /// ```
+    ///
+    /// [`Iterator`]: https://doc.rust-lang.org/std/iter/trait.Iterator.html
+    pub fn row_iter_mut(
+        &mut self,
+        row_index: usize,
+    ) -> Result<impl DoubleEndedIterator<Item = &mut T>, Error> {
+        let start = self
+            .get_index(row_index, 0)
+            .ok_or(Error::IndicesOutOfBounds(row_index, 0))?;
+        let end = start + self.row_len();
+        Ok(self.array[start..end].iter_mut())
+    }
+
     /// Returns an [`Iterator`] over references to all elements in the given
     /// column. Returns an error if the index is out of bounds.
     ///

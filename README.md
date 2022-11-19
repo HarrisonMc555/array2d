@@ -44,7 +44,7 @@ An [`Array2D`] can be created in many different ways. These include:
 through:
   - All of the elements, in either [row major or column major order] (see
     [`elements_row_major_iter`] and [`elements_column_major_iter`]).
-  - Individual rows or columns (see [`row_iter`] and [`column_iter`]).
+  - Individual rows or columns (see [`row_iter`], [`row_iter_mut`] and [`column_iter`]).
   - All rows or all columns (see [`rows_iter`] and [`columns_iter`]).
 
 ### Extracting all data from an [`Array2D`]
@@ -139,6 +139,7 @@ pub fn main() -> Result<(), Error> {
 [`elements_row_major_iter`]: struct.Array2D.html#method.elements_row_major_iter
 [`elements_column_major_iter`]: struct.Array2D.html#method.elements_column_major_iter
 [`row_iter`]: struct.Array2D.html#method.row_iter
+[`row_iter_mut`]: struct.Array2D.html#method.row_iter_mut
 [`column_iter`]: struct.Array2D.html#method.column_iter
 [`rows_iter`]: struct.Array2D.html#method.rows_iter
 [`columns_iter`]: struct.Array2D.html#method.columns_iter
