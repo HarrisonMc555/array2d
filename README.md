@@ -47,6 +47,8 @@ through:
   - Individual rows or columns (see [`row_iter`] and [`column_iter`]).
   - Individual rows and columns of mutable entries (see [`row_iter_mut`] and [`column_iter_mut`]).
   - All rows or all columns (see [`rows_iter`] and [`columns_iter`]).
+  - All rows or all columns of mutable entries (see [`rows_iter_mut`]).
+
 
 ### Extracting all data from an [`Array2D`]
 
@@ -145,6 +147,7 @@ pub fn main() -> Result<(), Error> {
 [`column_iter_mut`]: struct.Array2D.html#method.column_iter_mut
 [`rows_iter`]: struct.Array2D.html#method.rows_iter
 [`columns_iter`]: struct.Array2D.html#method.columns_iter
+[`rows_iter_mut`]: struct.Array2D.html#method.rows_iter_mut
 [`as_rows`]: struct.Array2D.html#method.as_rows
 [`as_columns`]: struct.Array2D.html#method.as_columns
 [`as_row_major`]: struct.Array2D.html#method.as_row_major

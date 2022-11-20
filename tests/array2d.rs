@@ -383,6 +383,19 @@ fn test_rows_iter() -> Result<(), Error> {
 }
 
 #[test]
+fn test_rows_iter_mut() -> Result<(), Error> {
+    let rows = vec![vec![1, 2, 3], vec![4, 5, 6]];
+    let mut array = Array2D::from_rows(&rows)?;
+    for (row_index, row_iter) in array.rows_iter_mut().enumerate() {
+        for (column_index, element) in row_iter.enumerate() {
+            *element += 1;
+            assert_eq!(*element, &rows[row_index][column_index] + 1);
+        }
+    }
+    Ok(())
+}
+
+#[test]
 fn test_columns_iter() -> Result<(), Error> {
     let rows = vec![vec![1, 2, 3], vec![4, 5, 6]];
     let array = Array2D::from_rows(&rows)?;
