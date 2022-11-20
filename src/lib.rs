@@ -43,7 +43,9 @@
 //!   - All of the elements, in either [row major or column major order] (see
 //!     [`elements_row_major_iter`] and [`elements_column_major_iter`]).
 //!   - Individual rows or columns (see [`row_iter`] and [`column_iter`]).
+//!   - Individual rows and columns of mutable entries (see [`row_iter_mut`] and [`column_iter_mut`]).
 //!   - All rows or all columns (see [`rows_iter`] and [`columns_iter`]).
+//!
 //!
 //! ## Extracting all data from an [`Array2D`]
 //!
@@ -923,6 +925,39 @@ impl<T> Array2D<T> {
             return Err(Error::IndicesOutOfBounds(0, column_index));
         }
         Ok((0..self.column_len()).map(move |row_index| &self[(row_index, column_index)]))
+    }
+
+    /// Returns an [`Iterator`] over mutable references to all elements in the given
+    /// column. Returns an error if the index is out of bounds.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// # use array2d::{Array2D, Error};
+    /// # fn main() -> Result<(), Error> {
+    /// let rows = vec![vec![1, 2, 3], vec![4, 5, 6]];
+    /// let mut array = Array2D::from_rows(&rows)?;
+    /// let mut column_iter = array.column_iter_mut(1)?;
+    /// assert_eq!(column_iter.next(), Some(&mut 2));
+    /// assert_eq!(column_iter.next(), Some(&mut 5));
+    /// assert_eq!(column_iter.next(), None);
+    /// # Ok(())
+    /// # }
+    /// ```
+    ///
+    /// [`Iterator`]: https://doc.rust-lang.org/std/iter/trait.Iterator.html
+    pub fn column_iter_mut(
+        &mut self,
+        column_index: usize,
+    ) -> Result<impl DoubleEndedIterator<Item = &mut T>, Error> {
+        if column_index >= self.num_columns {
+            return Err(Error::IndicesOutOfBounds(0, column_index));
+        }
+        Ok(self
+            .array
+            .iter_mut()
+            .skip(column_index)
+            .step_by(self.num_columns))
     }
 
     /// Returns an [`Iterator`] over all rows. Each [`Item`] is itself another
