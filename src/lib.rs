@@ -727,7 +727,7 @@ impl<T> Array2D<T> {
             .map(|location| {
                 *location = element;
             })
-            .ok_or_else(|| Error::IndicesOutOfBounds(row, column))
+            .ok_or(Error::IndicesOutOfBounds(row, column))
     }
 
     /// Changes the element at the given `index` to `element`, in row major
@@ -757,7 +757,7 @@ impl<T> Array2D<T> {
             .map(|location| {
                 *location = element;
             })
-            .ok_or_else(|| Error::IndexOutOfBounds(index))
+            .ok_or(Error::IndexOutOfBounds(index))
     }
 
     /// Changes the element at the given `index` to `element`, in column major
@@ -787,7 +787,7 @@ impl<T> Array2D<T> {
             .map(|location| {
                 *location = element;
             })
-            .ok_or_else(|| Error::IndexOutOfBounds(index))
+            .ok_or(Error::IndexOutOfBounds(index))
     }
 
     /// Returns an [`Iterator`] over references to all elements in [row major
