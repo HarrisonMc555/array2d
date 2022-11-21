@@ -1217,18 +1217,14 @@ impl<T> Array2D<T> {
     pub fn columns_iter_mut(
         &mut self,
     ) -> impl DoubleEndedIterator<Item = impl DoubleEndedIterator<Item = &mut T>> {
-        let (element_count, column_len, row_len) =
-            (self.num_elements(), self.column_len(), self.row_len());
+        let (num_columns, num_rows) = (self.num_columns(), self.num_rows());
         let pointer = self.array.as_mut_ptr();
-        self.array
-            .chunks_mut(column_len)
-            .enumerate()
-            .map(move |(ci, c)| {
-                c.iter_mut().enumerate().map(move |(i, _)| {
-                    let offset = (i * row_len) % element_count + ci;
-                    unsafe { &mut *pointer.add(offset) }
-                })
+        (0..num_columns).map(move |ci| {
+            (0..num_rows).map(move |i| {
+                let offset = (i * num_columns) + ci;
+                unsafe { &mut *pointer.add(offset) }
             })
+        })
     }
 
     /// Collects the [`Array2D`] into a [`Vec`] of rows, each of which contains
