@@ -45,7 +45,7 @@ through:
   - All of the elements, in either [row major or column major order] (see
     [`elements_row_major_iter`] and [`elements_column_major_iter`]).
   - All of the elements as mutable references, in [row major or column major order] (see
-    [`elements_row_major_iter_mut`]).
+    [`elements_row_major_iter_mut`] and [`elements_column_major_iter_mut`]).
   - Individual rows or columns (see [`row_iter`] and [`column_iter`]).
   - Individual rows and columns of mutable entries (see [`row_iter_mut`] and [`column_iter_mut`]).
   - All rows or all columns (see [`rows_iter`] and [`columns_iter`]).
@@ -144,6 +144,7 @@ pub fn main() -> Result<(), Error> {
 [`elements_row_major_iter`]: struct.Array2D.html#method.elements_row_major_iter
 [`elements_column_major_iter`]: struct.Array2D.html#method.elements_column_major_iter
 [`elements_row_major_iter_mut`]: struct.Array2D.html#method.elements_row_major_iter_mut
+[`elements_column_major_iter_mut`]: struct.Array2D.html#method.elements_column_major_iter_mut
 [`row_iter`]: struct.Array2D.html#method.row_iter
 [`column_iter`]: struct.Array2D.html#method.column_iter
 [`row_iter_mut`]: struct.Array2D.html#method.row_iter_mut

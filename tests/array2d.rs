@@ -324,6 +324,23 @@ fn test_elements_column_major_iter() -> Result<(), Error> {
 }
 
 #[test]
+fn test_elements_column_major_iter_mut() -> Result<(), Error> {
+    let rows = vec![vec![1, 2, 3], vec![4, 5, 6]];
+    let column_major = vec![1, 4, 2, 5, 3, 6];
+    let mut array = Array2D::from_rows(&rows)?;
+    let column_len = rows.len();
+    for (index, element) in array.elements_column_major_iter_mut().enumerate() {
+        let column_index = index / column_len;
+        let row_index = index % column_len;
+        // Do it both ways to make sure we're doing this right
+        *element += 1;
+        assert_eq!(*element, &rows[row_index][column_index] + 1);
+        assert_eq!(*element, &column_major[index] + 1);
+    }
+    Ok(())
+}
+
+#[test]
 fn test_row_iter() -> Result<(), Error> {
     let rows = vec![vec![1, 2, 3], vec![4, 5, 6]];
     let array = Array2D::from_rows(&rows)?;

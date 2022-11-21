@@ -43,7 +43,7 @@
 //!   - All of the elements, in either [row major or column major order] (see
 //!     [`elements_row_major_iter`] and [`elements_column_major_iter`]).
 //!   - All of the elements as mutable references, in [row major or column major order] (see
-//!     [`elements_row_major_iter_mut`]).
+//!     [`elements_row_major_iter_mut`] and [`elements_column_major_iter_mut`]).
 //!   - Individual rows or columns (see [`row_iter`] and [`column_iter`]).
 //!   - Individual rows and columns of mutable entries (see [`row_iter_mut`] and [`column_iter_mut`]).
 //!   - All rows or all columns (see [`rows_iter`] and [`columns_iter`]).
@@ -142,6 +142,7 @@
 //! [`elements_row_major_iter`]: struct.Array2D.html#method.elements_row_major_iter
 //! [`elements_column_major_iter`]: struct.Array2D.html#method.elements_column_major_iter
 //! [`elements_row_major_iter_mut`]: struct.Array2D.html#method.elements_row_major_iter_mut
+//! [`elements_column_major_iter_mut`]: struct.Array2D.html#method.elements_column_major_iter_mut
 //! [`row_iter`]: struct.Array2D.html#method.row_iter
 //! [`column_iter`]: struct.Array2D.html#method.column_iter
 //! [`rows_iter`]: struct.Array2D.html#method.rows_iter
@@ -875,6 +876,43 @@ impl<T> Array2D<T> {
             .flat_map(move |column| (0..self.num_rows).map(move |row| &self[(row, column)]))
     }
 
+    /// Returns an [`Iterator`] over mutable references to all elements in [column major
+    /// order].
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// # use array2d::{Array2D, Error};
+    /// # fn main() -> Result<(), Error> {
+    /// let rows = vec![vec![1, 2, 3], vec![4, 5, 6], vec![7, 8, 9]];
+    /// let elements = vec![1, 4, 7, 2, 5, 8, 3, 6, 9];
+    /// let mut array = Array2D::from_rows(&rows)?;
+    /// let column_major = array.elements_column_major_iter_mut();
+    /// for (i, val) in column_major
+    ///     .map(|val| {
+    ///         *val += 1;
+    ///         val
+    ///     })
+    ///     .enumerate()
+    /// {
+    ///     assert_eq!(*val, elements[i] + 1);
+    /// }
+    /// # Ok(())
+    /// # }
+    /// ```
+    ///
+    /// [`Iterator`]: https://doc.rust-lang.org/std/iter/trait.Iterator.html
+    /// [column major order]: https://en.wikipedia.org/wiki/Row-_and_column-major_order
+    pub fn elements_column_major_iter_mut(&mut self) -> impl DoubleEndedIterator<Item = &mut T> {
+        let (element_count, column_len, row_len) =
+            (self.num_elements(), self.column_len(), self.row_len());
+        let pointer = self.array.as_mut_ptr();
+        self.array.iter_mut().enumerate().map(move |(i, _)| {
+            let offset = (i * row_len) % element_count + (i / column_len);
+            unsafe { &mut *pointer.add(offset) }
+        })
+    }
+
     /// Returns an [`Iterator`] over references to all elements in the given
     /// row. Returns an error if the index is out of bounds.
     ///
@@ -1085,7 +1123,7 @@ impl<T> Array2D<T> {
         &mut self,
     ) -> impl DoubleEndedIterator<Item = impl DoubleEndedIterator<Item = &mut T>> {
         let row_len = self.row_len();
-        self.array.chunks_mut(row_len).map(|r| r.into_iter())
+        self.array.chunks_mut(row_len).map(|r| r.iter_mut())
     }
 
     /// Returns an [`Iterator`] over all columns. Each [`Item`] is itself
