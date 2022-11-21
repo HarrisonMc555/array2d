@@ -442,6 +442,19 @@ fn test_columns_iter() -> Result<(), Error> {
 }
 
 #[test]
+fn test_columns_iter_mut() -> Result<(), Error> {
+    let rows = vec![vec![1, 2, 3], vec![4, 5, 6]];
+    let mut array = Array2D::from_rows(&rows)?;
+    for (column_index, column_iter) in array.columns_iter_mut().enumerate() {
+        for (row_index, element) in column_iter.enumerate() {
+            *element += 1;
+            assert_eq!(*element, &rows[row_index][column_index] + 1);
+        }
+    }
+    Ok(())
+}
+
+#[test]
 fn test_op_index() -> Result<(), Error> {
     let rows = vec![vec![1, 2, 3], vec![4, 5, 6]];
     let array = Array2D::from_rows(&rows)?;

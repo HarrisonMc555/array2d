@@ -47,7 +47,7 @@
 //!   - Individual rows or columns (see [`row_iter`] and [`column_iter`]).
 //!   - Individual rows and columns of mutable entries (see [`row_iter_mut`] and [`column_iter_mut`]).
 //!   - All rows or all columns (see [`rows_iter`] and [`columns_iter`]).
-//!   - All rows or all columns of mutable entries (see [`rows_iter_mut`]).
+//!   - All rows or all columns of mutable entries (see [`rows_iter_mut`] and [`columns_iter_mut`]).
 //!
 //!
 //! ## Extracting all data from an [`Array2D`]
@@ -145,9 +145,12 @@
 //! [`elements_column_major_iter_mut`]: struct.Array2D.html#method.elements_column_major_iter_mut
 //! [`row_iter`]: struct.Array2D.html#method.row_iter
 //! [`column_iter`]: struct.Array2D.html#method.column_iter
+//! [`row_iter_mut`]: struct.Array2D.html#method.row_iter_mut
+//! [`column_iter_mut`]: struct.Array2D.html#method.column_iter_mut
 //! [`rows_iter`]: struct.Array2D.html#method.rows_iter
 //! [`columns_iter`]: struct.Array2D.html#method.columns_iter
 //! [`rows_iter_mut`]: struct.Array2D.html#method.rows_iter_mut
+//! [`columns_iter_mut`]: struct.Array2D.html#method.columns_iter_mut
 //! [`as_rows`]: struct.Array2D.html#method.as_rows
 //! [`as_columns`]: struct.Array2D.html#method.as_columns
 //! [`as_row_major`]: struct.Array2D.html#method.as_row_major
@@ -904,13 +907,7 @@ impl<T> Array2D<T> {
     /// [`Iterator`]: https://doc.rust-lang.org/std/iter/trait.Iterator.html
     /// [column major order]: https://en.wikipedia.org/wiki/Row-_and_column-major_order
     pub fn elements_column_major_iter_mut(&mut self) -> impl DoubleEndedIterator<Item = &mut T> {
-        let (element_count, column_len, row_len) =
-            (self.num_elements(), self.column_len(), self.row_len());
-        let pointer = self.array.as_mut_ptr();
-        self.array.iter_mut().enumerate().map(move |(i, _)| {
-            let offset = (i * row_len) % element_count + (i / column_len);
-            unsafe { &mut *pointer.add(offset) }
-        })
+        self.columns_iter_mut().flatten()
     }
 
     /// Returns an [`Iterator`] over references to all elements in the given
@@ -1174,6 +1171,64 @@ impl<T> Array2D<T> {
             self.column_iter(column_index)
                 .expect("columns_iter should never fail")
         })
+    }
+
+    /// Returns an [`Iterator`] over all columns. Each [`Item`] is itself
+    /// another [`Iterator`] over mutable references to the elements in that column.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// # use array2d::{Array2D, Error};
+    /// # fn main() -> Result<(), Error> {
+    /// let rows = vec![vec![1, 2, 3], vec![4, 5, 6]];
+    /// let mut array = Array2D::from_rows(&rows)?;
+    /// for column_iter in array.columns_iter_mut() {
+    ///     for element in column_iter {
+    ///         print!("{} ", element);
+    ///     }
+    ///     println!();
+    /// }
+    ///
+    /// let mut columns_iter = array.columns_iter_mut();
+    ///
+    /// let mut first_column_iter = columns_iter.next().unwrap();
+    /// assert_eq!(first_column_iter.next(), Some(&mut 1));
+    /// assert_eq!(first_column_iter.next(), Some(&mut 4));
+    /// assert_eq!(first_column_iter.next(), None);
+    ///
+    /// let mut second_column_iter = columns_iter.next().unwrap();
+    /// assert_eq!(second_column_iter.next(), Some(&mut 2));
+    /// assert_eq!(second_column_iter.next(), Some(&mut 5));
+    /// assert_eq!(second_column_iter.next(), None);
+    ///
+    /// let mut third_column_iter = columns_iter.next().unwrap();
+    /// assert_eq!(third_column_iter.next(), Some(&mut 3));
+    /// assert_eq!(third_column_iter.next(), Some(&mut 6));
+    /// assert_eq!(third_column_iter.next(), None);
+    ///
+    /// assert!(columns_iter.next().is_none());
+    /// # Ok(())
+    /// # }
+    /// ```
+    ///
+    /// [`Iterator`]: https://doc.rust-lang.org/std/iter/trait.Iterator.html
+    /// [`Item`]: https://doc.rust-lang.org/std/iter/trait.Iterator.html#associatedtype.Item
+    pub fn columns_iter_mut(
+        &mut self,
+    ) -> impl DoubleEndedIterator<Item = impl DoubleEndedIterator<Item = &mut T>> {
+        let (element_count, column_len, row_len) =
+            (self.num_elements(), self.column_len(), self.row_len());
+        let pointer = self.array.as_mut_ptr();
+        self.array
+            .chunks_mut(column_len)
+            .enumerate()
+            .map(move |(ci, c)| {
+                c.iter_mut().enumerate().map(move |(i, _)| {
+                    let offset = (i * row_len) % element_count + ci;
+                    unsafe { &mut *pointer.add(offset) }
+                })
+            })
     }
 
     /// Collects the [`Array2D`] into a [`Vec`] of rows, each of which contains
