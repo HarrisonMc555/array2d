@@ -118,7 +118,6 @@
 //!     
 //!     Ok(())
 //! }
-//!
 //! ```
 //!
 //! [`Array2D`]: struct.Array2D.html
@@ -134,6 +133,12 @@
 //! [`get`]: struct.Array2D.html#method.get
 //! [`get_mut`]: struct.Array2D.html#method.get_mut
 //! [`set`]: struct.Array2D.html#method.set
+//! [`get_row_major`]: struct.Array2D.html#method.get_row_major
+//! [`get_mut_row_major`]: struct.Array2D.html#method.get_mut_row_major
+//! [`set_row_major`]: struct.Array2D.html#method.set_row_major
+//! [`get_column_major`]: struct.Array2D.html#method.get_column_major
+//! [`get_mut_column_major`]: struct.Array2D.html#method.get_mut_column_major
+//! [`set_column_major`]: struct.Array2D.html#method.set_column_major
 //! [`elements_row_major_iter`]: struct.Array2D.html#method.elements_row_major_iter
 //! [`elements_column_major_iter`]: struct.Array2D.html#method.elements_column_major_iter
 //! [`row_iter`]: struct.Array2D.html#method.row_iter
