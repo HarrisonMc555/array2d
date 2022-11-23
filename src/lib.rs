@@ -833,8 +833,7 @@ impl<T> Array2D<T> {
     /// [`Iterator`]: https://doc.rust-lang.org/std/iter/trait.Iterator.html
     /// [column major order]: https://en.wikipedia.org/wiki/Row-_and_column-major_order
     pub fn elements_column_major_iter(&self) -> impl DoubleEndedIterator<Item = &T> {
-        (0..self.num_columns)
-            .flat_map(move |column| (0..self.num_rows).map(move |row| &self[(row, column)]))
+        self.indices_column_major().map(move |i| &self[i])
     }
 
     /// Returns an [`Iterator`] over references to all elements in the given
