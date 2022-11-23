@@ -393,6 +393,34 @@ fn test_elements_row_major_iter() -> Result<(), Error> {
 }
 
 #[test]
+fn test_elements_row_major_iter_mut() -> Result<(), Error> {
+    let rows = vec![vec![1, 2, 3], vec![4, 5, 6]];
+    let mut array = Array2D::from_rows(&rows)?;
+
+    for element in array.elements_row_major_iter_mut() {
+        if element == &5 {
+            *element = 99;
+        }
+    }
+    let row_major_actual = array.as_row_major();
+    let row_major_expected = vec![1, 2, 3, 4, 99, 6];
+    assert_eq!(row_major_expected, row_major_actual);
+
+    let rows = vec![vec![1, 2, 3], vec![4, 5, 6]];
+    let mut array = Array2D::from_rows(&rows)?;
+    let mut multiplier = 10;
+    for element in array.elements_row_major_iter_mut() {
+        *element *= multiplier;
+        multiplier += 1;
+    }
+    let row_major_actual = array.as_row_major();
+    let row_major_expected = vec![10, 22, 36, 52, 70, 90];
+    assert_eq!(row_major_expected, row_major_actual);
+
+    Ok(())
+}
+
+#[test]
 fn test_elements_column_major_iter() -> Result<(), Error> {
     let rows = vec![vec![1, 2, 3], vec![4, 5, 6]];
     let column_major = vec![1, 4, 2, 5, 3, 6];
@@ -802,6 +830,28 @@ fn test_enumerate_row_major() -> Result<(), Error> {
     );
     Ok(())
 }
+
+// #[test]
+// fn foo() -> Result<(), Error> {
+//     let rows = vec![vec![1, 2, 3], vec![4, 5, 6]];
+//     let mut array = Array2D::from_rows(&rows)?;
+//     {
+//         let mut iter = array.elements_row_major_iter_mut();
+//         let e1 = iter.next().unwrap();
+//         let e2 = iter.next().unwrap();
+//         let e3 = iter.next().unwrap();
+//         let e4 = iter.next().unwrap();
+//         *e4 = 40;
+//         *e3 = 30;
+//         *e2 = 20;
+//         *e1 = 10;
+//     }
+//     println!("Rows: {:?}", array.as_rows());
+//     let elements_actual = array.as_row_major();
+//     let elements_expected = vec![10, 20, 30, 40, 5, 6];
+//     assert_eq!(elements_expected, elements_actual);
+//     Ok(())
+// }
 
 fn main() -> Result<(), Error> {
     let rows = vec![vec![1, 2, 3], vec![4, 5, 6]];

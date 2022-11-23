@@ -958,6 +958,34 @@ impl<T> Array2D<T> {
         self.array.iter()
     }
 
+    /// Returns a mutable [`Iterator`] over references to all elements in [row
+    /// major order].
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// # use array2d::{Array2D, Error};
+    /// # fn main() -> Result<(), Error> {
+    /// let rows = vec![vec![1, 2, 3], vec![4, 5, 6]];
+    /// let mut array = Array2D::from_rows(&rows)?;
+    /// for element in array.elements_row_major_iter_mut() {
+    ///     if element == &5 {
+    ///         *element = 99;
+    ///     }
+    /// }
+    /// let row_major_actual = array.as_row_major();
+    /// let row_major_expected = vec![1, 2, 3, 4, 99, 6];
+    /// assert_eq!(row_major_expected, row_major_actual);
+    /// # Ok(())
+    /// # }
+    /// ```
+    ///
+    /// [`Iterator`]: https://doc.rust-lang.org/std/iter/trait.Iterator.html
+    /// [row major order]: https://en.wikipedia.org/wiki/Row-_and_column-major_order
+    pub fn elements_row_major_iter_mut(&mut self) -> impl DoubleEndedIterator<Item = &mut T> {
+        self.array.iter_mut()
+    }
+
     /// Returns an [`Iterator`] over references to all elements in [column major
     /// order].
     ///
@@ -979,6 +1007,29 @@ impl<T> Array2D<T> {
     /// [column major order]: https://en.wikipedia.org/wiki/Row-_and_column-major_order
     pub fn elements_column_major_iter(&self) -> impl DoubleEndedIterator<Item = &T> + Clone {
         self.indices_column_major().map(move |i| &self[i])
+    }
+
+    /// Returns a mutable [`Iterator`] over references to all elements in
+    /// [column major order].
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// # use array2d::{Array2D, Error};
+    /// # fn main() -> Result<(), Error> {
+    /// let rows = vec![vec![1, 2, 3], vec![4, 5, 6]];
+    /// let elements = vec![1, 4, 2, 5, 3, 6];
+    /// let array = Array2D::from_rows(&rows)?;
+    /// let column_major = array.elements_column_major_iter();
+    /// assert_eq!(column_major.cloned().collect::<Vec<_>>(), elements);
+    /// # Ok(())
+    /// # }
+    /// ```
+    ///
+    /// [`Iterator`]: https://doc.rust-lang.org/std/iter/trait.Iterator.html
+    /// [column major order]: https://en.wikipedia.org/wiki/Row-_and_column-major_order
+    pub fn elements_column_major_iter_mut(&mut self) -> impl DoubleEndedIterator<Item = &mut T> {
+        self.indices_column_major().map(move |i| &mut self[i])
     }
 
     /// Returns an [`Iterator`] over references to all elements in the given
