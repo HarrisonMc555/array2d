@@ -1167,7 +1167,9 @@ impl<T> Array2D<T> {
     /// # }
     ///
     /// [`usize`]: https://doc.rust-lang.org/std/primitive.usize.html
-    pub fn enumerate_row_major(&self) -> impl DoubleEndedIterator<Item = ((usize, usize), &T)> + Clone {
+    pub fn enumerate_row_major(
+        &self,
+    ) -> impl DoubleEndedIterator<Item = ((usize, usize), &T)> + Clone {
         self.indices_row_major().map(move |i| (i, &self[i]))
     }
 
@@ -1195,7 +1197,9 @@ impl<T> Array2D<T> {
     /// # }
     ///
     /// [`usize`]: https://doc.rust-lang.org/std/primitive.usize.html
-    pub fn enumerate_column_major(&self) -> impl DoubleEndedIterator<Item = ((usize, usize), &T)> + Clone {
+    pub fn enumerate_column_major(
+        &self,
+    ) -> impl DoubleEndedIterator<Item = ((usize, usize), &T)> + Clone {
         self.indices_column_major().map(move |i| (i, &self[i]))
     }
 
