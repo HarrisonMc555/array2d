@@ -1147,6 +1147,8 @@ impl<T> Array2D<T> {
     /// index is a tuple of [`usize`].
     ///
     /// # Examples
+    ///
+    /// ```
     /// # use array2d::{Array2D, Error};
     /// # fn main() -> Result<(), Error> {
     /// let rows = vec![vec![1, 2, 3], vec![4, 5, 6]];
@@ -1165,6 +1167,7 @@ impl<T> Array2D<T> {
     /// );
     /// # Ok(())
     /// # }
+    /// ```
     ///
     /// [`usize`]: https://doc.rust-lang.org/std/primitive.usize.html
     pub fn enumerate_row_major(
@@ -1177,6 +1180,8 @@ impl<T> Array2D<T> {
     /// index is a tuple of [`usize`].
     ///
     /// # Examples
+    ///
+    /// ```
     /// # use array2d::{Array2D, Error};
     /// # fn main() -> Result<(), Error> {
     /// let rows = vec![vec![1, 2, 3], vec![4, 5, 6]];
@@ -1195,6 +1200,7 @@ impl<T> Array2D<T> {
     /// );
     /// # Ok(())
     /// # }
+    /// ```
     ///
     /// [`usize`]: https://doc.rust-lang.org/std/primitive.usize.html
     pub fn enumerate_column_major(
