@@ -60,7 +60,7 @@
 //!
 //! pub fn main() -> Result<(), Error> {
 //!     // Create an array filled with the same element.
-//!     let prefilled = Array2D::filled_with(2, 3, 42);
+//!     let prefilled = Array2D::filled_with( 2, 3,42);
 //!     assert_eq!(prefilled.num_rows(), 2);
 //!     assert_eq!(prefilled.num_columns(), 3);
 //!     assert_eq!(prefilled[(0, 0)], 42);
@@ -77,7 +77,7 @@
 //!     // column major order.
 //!     let column_major = vec![1, 4, 2, 5, 3, 6];
 //!     let from_column_major =
-//!         Array2D::from_column_major(2, 3, &column_major)?;
+//!         Array2D::from_column_major( 2, 3,&column_major)?;
 //!     assert_eq!(from_column_major.num_rows(), 2);
 //!     assert_eq!(from_column_major.num_columns(), 3);
 //!     assert_eq!(from_column_major[(1, 1)], 5);
@@ -291,7 +291,7 @@ impl<T> Array2D<T> {
     /// # use array2d::{Array2D, Error};
     /// # fn main() -> Result<(), Error> {
     /// let row_major = vec![1, 2, 3, 4, 5, 6];
-    /// let array = Array2D::from_row_major(2, 3, &row_major)?;
+    /// let array = Array2D::from_row_major( 2, 3,&row_major)?;
     /// assert_eq!(array[(1, 2)], 6);
     /// assert_eq!(array.as_rows(), vec![vec![1, 2, 3], vec![4, 5, 6]]);
     /// # Ok(())
@@ -332,7 +332,7 @@ impl<T> Array2D<T> {
     /// # use array2d::{Array2D, Error};
     /// # fn main() -> Result<(), Error> {
     /// let column_major = vec![1, 4, 2, 5, 3, 6];
-    /// let array = Array2D::from_column_major(2, 3, &column_major)?;
+    /// let array = Array2D::from_column_major( 2, 3,&column_major)?;
     /// assert_eq!(array[(1, 2)], 6);
     /// assert_eq!(array.as_rows(), vec![vec![1, 2, 3], vec![4, 5, 6]]);
     /// # Ok(())
@@ -375,7 +375,7 @@ impl<T> Array2D<T> {
     ///
     /// ```
     /// # use array2d::{Array2D, Error};
-    /// let array = Array2D::filled_with(2, 3, 42);
+    /// let array = Array2D::filled_with( 2, 3,42);
     /// assert_eq!(array.as_rows(), vec![vec![42, 42, 42], vec![42, 42, 42]]);
     /// ```
     ///
@@ -417,7 +417,7 @@ impl<T> Array2D<T> {
     ///     counter += 1;
     ///     tmp
     /// };
-    /// let array = Array2D::filled_by_row_major(2, 3, increment);
+    /// let array = Array2D::filled_by_row_major( 2, 3,increment);
     /// assert_eq!(array.as_rows(), vec![vec![1, 2, 3], vec![4, 5, 6]]);
     /// ```
     ///
@@ -450,7 +450,7 @@ impl<T> Array2D<T> {
     ///     counter += 1;
     ///     tmp
     /// };
-    /// let array = Array2D::filled_by_column_major(2, 3, increment);
+    /// let array = Array2D::filled_by_column_major( 2, 3,increment);
     /// assert_eq!(array.as_columns(), vec![vec![1, 2], vec![3, 4], vec![5, 6]]);
     /// ```
     ///
@@ -480,7 +480,7 @@ impl<T> Array2D<T> {
     /// # use array2d::{Array2D, Error};
     /// # fn main() -> Result<(), Error> {
     /// let iterator = 1..;
-    /// let array = Array2D::from_iter_row_major(2, 3, iterator)?;
+    /// let array = Array2D::from_iter_row_major( 2, 3,iterator)?;
     /// assert_eq!(array.as_rows(), vec![vec![1, 2, 3], vec![4, 5, 6]]);
     /// # Ok(())
     /// # }
@@ -522,7 +522,7 @@ impl<T> Array2D<T> {
     /// # use array2d::{Array2D, Error};
     /// # fn main() -> Result<(), Error> {
     /// let iterator = 1..;
-    /// let array = Array2D::from_iter_column_major(2, 3, iterator)?;
+    /// let array = Array2D::from_iter_column_major( 2, 3,iterator)?;
     /// assert_eq!(array.as_rows(), vec![vec![1, 3, 5], vec![2, 4, 6]]);
     /// # Ok(())
     /// # }
@@ -579,7 +579,7 @@ impl<T> Array2D<T> {
     ///
     /// ```
     /// # use array2d::{Array2D, Error};
-    /// let array = Array2D::filled_with(2, 3, 42);
+    /// let array = Array2D::filled_with( 2, 3,42);
     /// assert_eq!(array.get(0, 0), Some(&42));
     /// assert_eq!(array.get(10, 10), None);
     /// ```
@@ -644,7 +644,7 @@ impl<T> Array2D<T> {
     ///
     /// ```
     /// # use array2d::{Array2D, Error};
-    /// let mut array = Array2D::filled_with(2, 3, 42);
+    /// let mut array = Array2D::filled_with( 2, 3,42);
     ///
     /// assert_eq!(array.get_mut(0, 0), Some(&mut 42));
     /// assert_eq!(array.get_mut(10, 10), None);
@@ -729,7 +729,7 @@ impl<T> Array2D<T> {
     ///
     /// ```
     /// # use array2d::{Array2D, Error};
-    /// let mut array = Array2D::filled_with(2, 3, 42);
+    /// let mut array = Array2D::filled_with( 2, 3,42);
     ///
     /// let result = array.set(0, 0, 100);
     /// assert_eq!(result, Ok(()));
@@ -759,7 +759,7 @@ impl<T> Array2D<T> {
     ///
     /// ```
     /// # use array2d::{Array2D, Error};
-    /// let mut array = Array2D::filled_with(2, 3, 42);
+    /// let mut array = Array2D::filled_with( 2, 3,42);
     ///
     /// let result = array.set_row_major(4, 100);
     /// assert_eq!(result, Ok(()));
@@ -789,7 +789,7 @@ impl<T> Array2D<T> {
     ///
     /// ```
     /// # use array2d::{Array2D, Error};
-    /// let mut array = Array2D::filled_with(2, 3, 42);
+    /// let mut array = Array2D::filled_with( 2, 3,42);
     ///
     /// let result = array.set_column_major(4, 100);
     /// assert_eq!(result, Ok(()));
@@ -1246,7 +1246,7 @@ impl<T> Index<(usize, usize)> for Array2D<T> {
     ///
     /// ```
     /// # use array2d::{Array2D, Error};
-    /// let array = Array2D::filled_with(2, 3, 42);
+    /// let array = Array2D::filled_with( 2, 3,42);
     /// assert_eq!(array[(0, 0)], 42);
     /// ```
     ///
@@ -1256,7 +1256,7 @@ impl<T> Index<(usize, usize)> for Array2D<T> {
     ///
     /// ```rust,should_panic
     /// # use array2d::Array2D;
-    /// let array = Array2D::filled_with(2, 3, 42);
+    /// let array = Array2D::filled_with( 2, 3,42);
     /// let element = array[(10, 10)];
     /// ```
     fn index(&self, (row, column): (usize, usize)) -> &Self::Output {
@@ -1273,7 +1273,7 @@ impl<T> IndexMut<(usize, usize)> for Array2D<T> {
     ///
     /// ```
     /// # use array2d::{Array2D, Error};
-    /// let mut array = Array2D::filled_with(2, 3, 42);
+    /// let mut array = Array2D::filled_with( 2, 3,42);
     /// array[(0, 0)] = 100;
     /// assert_eq!(array[(0, 0)], 100);
     /// ```
@@ -1284,7 +1284,7 @@ impl<T> IndexMut<(usize, usize)> for Array2D<T> {
     ///
     /// ```rust,should_panic
     /// # use array2d::Array2D;
-    /// let mut array = Array2D::filled_with(2, 3, 42);
+    /// let mut array = Array2D::filled_with( 2, 3,42);
     /// array[(10, 10)] = 7;
     /// ```
     fn index_mut(&mut self, (row, column): (usize, usize)) -> &mut Self::Output {
