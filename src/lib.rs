@@ -545,6 +545,136 @@ impl<T> Array2D<T> {
             .map_err(|_| Error::NotEnoughElements)
     }
 
+    /// Creates a new [`Array2D`] from an existing [`Array2D`]. Each element is traversed in [row major order]. The
+    /// element is passed to `mapper`, which produces the new element to use in the new array.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// # use array2d::{Array2D, Error};
+    /// # fn main() -> Result<(), Error> {
+    /// let rows = vec![vec![1, 2, 3], vec![4, 5, 6]];
+    /// let array = Array2D::from_rows(&rows)?;
+    /// let new_array = array.map_row_major(|x| x * 10);
+    /// let expected = vec![vec![10, 20, 30], vec![40, 50, 60]];
+    /// assert_eq!(new_array.as_rows(), expected);
+    /// # Ok(())
+    /// # }
+    /// ```
+    ///
+    /// [`Array2D`]: struct.Array2D.html
+    /// [row major order]: https://en.wikipedia.org/wiki/Row-_and_column-major_order
+    pub fn map_row_major<F, U>(&self, mapper: F) -> Array2D<U>
+    where
+        F: FnMut(&T) -> U,
+    {
+        let mut mapper = mapper;
+        Array2D::from_iter_row_major(
+            self.num_rows,
+            self.num_columns,
+            self.enumerate_row_major().map(|(_, element)| mapper(element)),
+        )
+        .expect("Source Array2D should have compatible values for num_rows, num_columns, and enumerate_row_major")
+    }
+
+    /// Creates a new [`Array2D`] from an existing [`Array2D`]. Each element is traversed in [colum  major order]. The
+    /// element is passed to `mapper`, which produces the new element to use in the new array.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// # use array2d::{Array2D, Error};
+    /// # fn main() -> Result<(), Error> {
+    /// let rows = vec![vec![1, 2, 3], vec![4, 5, 6]];
+    /// let array = Array2D::from_rows(&rows)?;
+    /// let new_array = array.map_column_major(|x| x * 10);
+    /// let expected = vec![vec![10, 20, 30], vec![40, 50, 60]];
+    /// assert_eq!(new_array.as_rows(), expected);
+    /// # Ok(())
+    /// # }
+    /// ```
+    ///
+    /// [`Array2D`]: struct.Array2D.html
+    /// [column major order]: https://en.wikipedia.org/wiki/Row-_and_column-major_order
+    pub fn map_column_major<F, U>(&self, mapper: F) -> Array2D<U>
+    where
+        F: FnMut(&T) -> U,
+        U: Clone,
+    {
+        let mut mapper = mapper;
+        Array2D::from_iter_column_major(
+            self.num_rows,
+            self.num_columns,
+            self.enumerate_column_major().map(|(_, element)| mapper(element)),
+        )
+        .expect("Source Array2D should have compatible values for num_rows, num_columns, and enumerate_column_major")
+    }
+
+    /// Creates a new [`Array2D`] from an existing [`Array2D`]. Each element is traversed in [row major order]. The
+    /// index and element are passed to `mapper`, which produces the new element to use in the new array.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// # use array2d::{Array2D, Error};
+    /// # fn main() -> Result<(), Error> {
+    /// let rows = vec![vec![1, 2, 3], vec![4, 5, 6]];
+    /// let array = Array2D::from_rows(&rows)?;
+    /// let new_array = array.map_with_index_row_major(|_, x| x * 10);
+    /// let expected = vec![vec![10, 20, 30], vec![40, 50, 60]];
+    /// assert_eq!(new_array.as_rows(), expected);
+    /// # Ok(())
+    /// # }
+    /// ```
+    ///
+    /// [`Array2D`]: struct.Array2D.html
+    /// [row major order]: https://en.wikipedia.org/wiki/Row-_and_column-major_order
+    pub fn map_with_index_row_major<F, U>(&self, mapper: F) -> Array2D<U>
+    where
+        F: FnMut((usize, usize), &T) -> U,
+    {
+        let mut mapper = mapper;
+        Array2D::from_iter_row_major(
+            self.num_rows,
+            self.num_columns,
+            self.enumerate_row_major().map(|(index, element)| mapper(index, element)),
+        )
+        .expect("Source Array2D should have compatible values for num_rows, num_columns, and enumerate_row_major")
+    }
+
+    /// Creates a new [`Array2D`] from an existing [`Array2D`]. Each element is traversed in [colum  major order]. The
+    /// index and element are passed to `mapper`, which produces the new element to use in the new array.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// # use array2d::{Array2D, Error};
+    /// # fn main() -> Result<(), Error> {
+    /// let rows = vec![vec![1, 2, 3], vec![4, 5, 6]];
+    /// let array = Array2D::from_rows(&rows)?;
+    /// let new_array = array.map_with_index_column_major(|_, x| x * 10);
+    /// let expected = vec![vec![10, 20, 30], vec![40, 50, 60]];
+    /// assert_eq!(new_array.as_rows(), expected);
+    /// # Ok(())
+    /// # }
+    /// ```
+    ///
+    /// [`Array2D`]: struct.Array2D.html
+    /// [column major order]: https://en.wikipedia.org/wiki/Row-_and_column-major_order
+    pub fn map_with_index_column_major<F, U>(&self, mapper: F) -> Array2D<U>
+    where
+        F: FnMut((usize, usize), &T) -> U,
+        U: Clone,
+    {
+        let mut mapper = mapper;
+        Array2D::from_iter_column_major(
+            self.num_rows,
+            self.num_columns,
+            self.enumerate_column_major().map(|(index, element)| mapper(index, element)),
+        )
+        .expect("Source Array2D should have compatible values for num_rows, num_columns, and enumerate_column_major")
+    }
+
     /// The number of rows.
     pub fn num_rows(&self) -> usize {
         self.num_rows

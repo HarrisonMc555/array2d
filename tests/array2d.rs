@@ -107,6 +107,108 @@ fn test_from_iter_column_major() -> Result<(), Error> {
 }
 
 #[test]
+fn test_map_row_major() -> Result<(), Error> {
+    let rows = vec![vec![1, 2, 3], vec![4, 5, 6]];
+    let array = Array2D::from_rows(&rows)?;
+
+    let new_array = array.map_row_major(|x| x * 10);
+    let expected = vec![vec![10, 20, 30], vec![40, 50, 60]];
+    assert_eq!(expected, new_array.as_rows());
+
+    let mut mutable_counter = 100;
+    let new_array = array.map_row_major(|_| {
+        mutable_counter += 1;
+        mutable_counter
+    });
+    let expected = vec![vec![101, 102, 103], vec![104, 105, 106]];
+    assert_eq!(expected, new_array.as_rows());
+
+    Ok(())
+}
+
+#[test]
+fn test_map_column_major() -> Result<(), Error> {
+    let rows = vec![vec![1, 2, 3], vec![4, 5, 6]];
+    let array = Array2D::from_rows(&rows)?;
+
+    let new_array = array.map_column_major(|x| x * 10);
+    let expected = vec![vec![10, 20, 30], vec![40, 50, 60]];
+    assert_eq!(expected, new_array.as_rows());
+
+    let mut mutable_counter = 100;
+    let new_array = array.map_column_major(|_| {
+        mutable_counter += 1;
+        mutable_counter
+    });
+    let expected = vec![vec![101, 103, 105], vec![102, 104, 106]];
+    assert_eq!(expected, new_array.as_rows());
+
+    Ok(())
+}
+
+#[test]
+fn test_map_with_index_row_major() -> Result<(), Error> {
+    let rows = vec![vec![1, 2, 3], vec![4, 5, 6]];
+    let array = Array2D::from_rows(&rows)?;
+
+    let new_array = array.map_with_index_row_major(|_, x| x * 10);
+    let expected = vec![vec![10, 20, 30], vec![40, 50, 60]];
+    assert_eq!(expected, new_array.as_rows());
+
+    let new_array = array.map_with_index_row_major(|i, _| i);
+    let expected = vec![vec![(0, 0), (0, 1), (0, 2)], vec![(1, 0), (1, 1), (1, 2)]];
+    assert_eq!(expected, new_array.as_rows());
+
+    let new_array = array.map_with_index_row_major(|i, e| format!("{} {:?}", e, i));
+    let expected = vec![
+        vec!["1 (0, 0)", "2 (0, 1)", "3 (0, 2)"],
+        vec!["4 (1, 0)", "5 (1, 1)", "6 (1, 2)"],
+    ];
+    assert_eq!(expected, new_array.as_rows());
+
+    let mut mutable_counter = 100;
+    let new_array = array.map_with_index_row_major(|_, _| {
+        mutable_counter += 1;
+        mutable_counter
+    });
+    let expected = vec![vec![101, 102, 103], vec![104, 105, 106]];
+    assert_eq!(expected, new_array.as_rows());
+
+    Ok(())
+}
+
+#[test]
+fn test_map_with_index_column_major() -> Result<(), Error> {
+    let rows = vec![vec![1, 2, 3], vec![4, 5, 6]];
+    let array = Array2D::from_rows(&rows)?;
+
+    let new_array = array.map_with_index_column_major(|_, x| x * 10);
+    let expected = vec![vec![10, 20, 30], vec![40, 50, 60]];
+    assert_eq!(expected, new_array.as_rows());
+
+    let new_array = array.map_with_index_column_major(|i, _| i);
+    let expected = vec![vec![(0, 0), (0, 1), (0, 2)], vec![(1, 0), (1, 1), (1, 2)]];
+    assert_eq!(expected, new_array.as_rows());
+
+    let new_array = array.map_with_index_column_major(|i, e| format!("{} {:?}", e, i));
+    let expected = vec![
+        vec!["1 (0, 0)", "2 (0, 1)", "3 (0, 2)"],
+        vec!["4 (1, 0)", "5 (1, 1)", "6 (1, 2)"],
+    ];
+    assert_eq!(expected, new_array.as_rows());
+
+    let mut mutable_counter = 100;
+    let new_array = array.map_with_index_column_major(|_, _| {
+        mutable_counter += 1;
+        mutable_counter
+    });
+    let expected = vec![vec![101, 103, 105], vec![102, 104, 106]];
+    assert_eq!(expected, new_array.as_rows());
+
+    Ok(())
+}
+
+#[test]
 fn test_dimensions() -> Result<(), Error> {
     let rows = vec![vec![1, 2, 3], vec![4, 5, 6]];
     let array = Array2D::from_rows(&rows)?;
