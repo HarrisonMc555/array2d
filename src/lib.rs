@@ -1019,9 +1019,15 @@ impl<T> Array2D<T> {
     /// # fn main() -> Result<(), Error> {
     /// let rows = vec![vec![1, 2, 3], vec![4, 5, 6]];
     /// let elements = vec![1, 4, 2, 5, 3, 6];
-    /// let array = Array2D::from_rows(&rows)?;
-    /// let column_major = array.elements_column_major_iter();
-    /// assert_eq!(column_major.cloned().collect::<Vec<_>>(), elements);
+    /// let mut array = Array2D::from_rows(&rows)?;
+    /// let mut factor = 10;
+    /// for element in array.elements_column_major_iter_mut() {
+    ///     *element *= factor;
+    ///     factor += 1;
+    /// }
+    /// let expected = vec![vec![10, 24, 42], vec![44, 65, 90]];
+    /// let actual = array.as_rows();
+    /// assert_eq!(expected, actual);
     /// # Ok(())
     /// # }
     /// ```
@@ -1029,7 +1035,21 @@ impl<T> Array2D<T> {
     /// [`Iterator`]: https://doc.rust-lang.org/std/iter/trait.Iterator.html
     /// [column major order]: https://en.wikipedia.org/wiki/Row-_and_column-major_order
     pub fn elements_column_major_iter_mut(&mut self) -> impl DoubleEndedIterator<Item = &mut T> {
-        self.indices_column_major().map(move |i| &mut self[i])
+        // The `Vec::iter_mut` function takes a mutable reference to a Vec and returns an iterator of mutable
+        // references to each underlying element. This function does the same thing but returns the mutable
+        // references in a different order. The same
+
+        // The `Vec::iter_mut` function takes a mutable reference to a Vec and returns an iterator of mutable
+        // references to each of the underlying elements. This is safe because you are effectively "splitting" the
+        // mutable reference to the entire Vec into pieces and getting mutable references to each non-overlapping
+        // piece of memory that represents each element. This function does the same thing--it splits a mutable
+        // reference to an Array2D (i.e. the underlying Vec) into mutable non-overlapping
+        // The `elements_column_major_iter` function returns immutable references to each of the
+        self.elements_column_major_iter().map(|reference| unsafe {
+            let const_ptr = reference as *const T;
+            let mut_ptr = const_ptr as *mut T;
+            &mut *mut_ptr
+        })
     }
 
     /// Returns an [`Iterator`] over references to all elements in the given

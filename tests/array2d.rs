@@ -437,6 +437,34 @@ fn test_elements_column_major_iter() -> Result<(), Error> {
 }
 
 #[test]
+fn test_elements_column_major_iter_mut() -> Result<(), Error> {
+    let rows = vec![vec![1, 2, 3], vec![4, 5, 6]];
+    let mut array = Array2D::from_rows(&rows)?;
+
+    for element in array.elements_column_major_iter_mut() {
+        if element == &5 {
+            *element = 99;
+        }
+    }
+    let column_major_actual = array.as_column_major();
+    let column_major_expected = vec![1, 4, 2, 99, 3, 6];
+    assert_eq!(column_major_expected, column_major_actual);
+
+    let rows = vec![vec![1, 2, 3], vec![4, 5, 6]];
+    let mut array = Array2D::from_rows(&rows)?;
+    let mut multiplier = 10;
+    for element in array.elements_column_major_iter_mut() {
+        *element *= multiplier;
+        multiplier += 1;
+    }
+    let column_major_actual = array.as_column_major();
+    let column_major_expected = vec![10, 44, 24, 65, 42, 90];
+    assert_eq!(column_major_expected, column_major_actual);
+
+    Ok(())
+}
+
+#[test]
 fn test_row_iter() -> Result<(), Error> {
     let rows = vec![vec![1, 2, 3], vec![4, 5, 6]];
     let array = Array2D::from_rows(&rows)?;
@@ -831,27 +859,21 @@ fn test_enumerate_row_major() -> Result<(), Error> {
     Ok(())
 }
 
-// #[test]
-// fn foo() -> Result<(), Error> {
-//     let rows = vec![vec![1, 2, 3], vec![4, 5, 6]];
-//     let mut array = Array2D::from_rows(&rows)?;
-//     {
-//         let mut iter = array.elements_row_major_iter_mut();
-//         let e1 = iter.next().unwrap();
-//         let e2 = iter.next().unwrap();
-//         let e3 = iter.next().unwrap();
-//         let e4 = iter.next().unwrap();
-//         *e4 = 40;
-//         *e3 = 30;
-//         *e2 = 20;
-//         *e1 = 10;
-//     }
-//     println!("Rows: {:?}", array.as_rows());
-//     let elements_actual = array.as_row_major();
-//     let elements_expected = vec![10, 20, 30, 40, 5, 6];
-//     assert_eq!(elements_expected, elements_actual);
-//     Ok(())
-// }
+/// You should not be able to access the array while a column-major mutable iterator is still active.
+///
+/// ```compile_fail
+/// # use array2d::{Array2D, Error};
+/// # fn main() -> Result<(), Error> {
+/// let rows = vec![vec![1, 2, 3], vec![4, 5, 6]];
+/// let elements = vec![1, 4, 2, 5, 3, 6];
+/// let mut array = Array2D::from_rows(&rows)?;
+/// let mut iter = array.elements_column_major_iter_mut();
+/// *iter.next().unwrap() = 99;
+/// println!("{}", array[(1, 1)]);
+/// *iter.next().unwrap() = 101;
+/// # Ok(())
+/// # }
+mod test_elements_column_major_iter_mut_compile_fail {}
 
 fn main() -> Result<(), Error> {
     let rows = vec![vec![1, 2, 3], vec![4, 5, 6]];
