@@ -157,6 +157,7 @@
 
 #![deny(missing_docs)]
 
+use std::fmt::{Display, Formatter};
 use std::ops::{Index, IndexMut};
 
 #[cfg(feature = "serde")]
@@ -185,6 +186,19 @@ pub enum Error {
     /// There were not enough elements to fill the array.
     NotEnoughElements,
 }
+
+impl Display for Error {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Error::IndicesOutOfBounds(row, column) => write!(f, "indices ({row}, {column}) out of bounds"),
+            Error::IndexOutOfBounds(index) => write!(f, "index {index} out of bounds"),
+            Error::DimensionMismatch => write!(f, "dimension mismatch"),
+            Error::NotEnoughElements => write!(f, "not enough elements"),
+        }
+    }
+}
+
+impl std::error::Error for Error {}
 
 impl<T> Array2D<T> {
     /// Creates a new [`Array2D`] from a slice of rows, each of which is a
