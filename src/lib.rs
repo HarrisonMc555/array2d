@@ -875,7 +875,7 @@ impl<T> Array2D<T> {
     /// ```
     ///
     /// [`Iterator`]: https://doc.rust-lang.org/std/iter/trait.Iterator.html
-    pub fn row_iter(&self, row_index: usize) -> Result<impl DoubleEndedIterator<Item = &T>, Error> {
+    pub fn row_iter(&self, row_index: usize) -> Result<impl DoubleEndedIterator<Item = &T> + Clone, Error> {
         let start = self
             .get_index(row_index, 0)
             .ok_or(Error::IndicesOutOfBounds(row_index, 0))?;
@@ -905,7 +905,7 @@ impl<T> Array2D<T> {
     pub fn column_iter(
         &self,
         column_index: usize,
-    ) -> Result<impl DoubleEndedIterator<Item = &T>, Error> {
+    ) -> Result<impl DoubleEndedIterator<Item = &T> + Clone, Error> {
         if column_index >= self.num_columns {
             return Err(Error::IndicesOutOfBounds(0, column_index));
         }
@@ -952,7 +952,7 @@ impl<T> Array2D<T> {
     /// [`Item`]: https://doc.rust-lang.org/std/iter/trait.Iterator.html#associatedtype.Item
     pub fn rows_iter(
         &self,
-    ) -> impl DoubleEndedIterator<Item = impl DoubleEndedIterator<Item = &T>> + Clone {
+    ) -> impl DoubleEndedIterator<Item = impl DoubleEndedIterator<Item = &T> + Clone> + Clone {
         (0..self.num_rows()).map(move |row_index| {
             self.row_iter(row_index)
                 .expect("rows_iter should never fail")
@@ -1002,7 +1002,7 @@ impl<T> Array2D<T> {
     /// [`Item`]: https://doc.rust-lang.org/std/iter/trait.Iterator.html#associatedtype.Item
     pub fn columns_iter(
         &self,
-    ) -> impl DoubleEndedIterator<Item = impl DoubleEndedIterator<Item = &T>> + Clone {
+    ) -> impl DoubleEndedIterator<Item = impl DoubleEndedIterator<Item = &T> + Clone> + Clone {
         (0..self.num_columns).map(move |column_index| {
             self.column_iter(column_index)
                 .expect("columns_iter should never fail")
