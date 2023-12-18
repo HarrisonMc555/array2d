@@ -477,7 +477,7 @@ impl<T> Array2D<T> {
     /// ```
     /// # use array2d::{Array2D, Error};
     /// # fn main() -> Result<(), Error> {
-    /// let iterator = (1..);
+    /// let iterator = 1..;
     /// let array = Array2D::from_iter_row_major(iterator, 2, 3)?;
     /// assert_eq!(array.as_rows(), vec![vec![1, 2, 3], vec![4, 5, 6]]);
     /// # Ok(())
@@ -519,7 +519,7 @@ impl<T> Array2D<T> {
     /// ```
     /// # use array2d::{Array2D, Error};
     /// # fn main() -> Result<(), Error> {
-    /// let iterator = (1..);
+    /// let iterator = 1..;
     /// let array = Array2D::from_iter_column_major(iterator, 2, 3)?;
     /// assert_eq!(array.as_rows(), vec![vec![1, 3, 5], vec![2, 4, 6]]);
     /// # Ok(())
