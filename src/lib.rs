@@ -393,15 +393,6 @@ impl<T> Array2D<T> {
         }
     }
 
-    #[deprecated(since = "0.2.0", note = "Renamed to filled_with")]
-    /// Renamed to filled_with.
-    pub fn fill_with(element: T, num_rows: usize, num_columns: usize) -> Self
-    where
-        T: Clone,
-    {
-        Array2D::filled_with(num_rows, num_columns, element)
-    }
-
     /// Creates a new [`Array2D`] with the specified number of rows and columns
     /// and fills each element with the result of calling the given
     /// function. The function is called once for every location going in
