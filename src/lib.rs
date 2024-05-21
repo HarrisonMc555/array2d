@@ -227,7 +227,7 @@ impl<T> Array2D<T> {
     where
         T: Clone,
     {
-        let row_len = elements.get(0).map(Vec::len).unwrap_or(0);
+        let row_len = elements.first().map(Vec::len).unwrap_or(0);
         if !elements.iter().all(|row| row.len() == row_len) {
             return Err(Error::DimensionMismatch);
         }
@@ -262,7 +262,7 @@ impl<T> Array2D<T> {
     where
         T: Clone,
     {
-        let column_len = elements.get(0).map(Vec::len).unwrap_or(0);
+        let column_len = elements.first().map(Vec::len).unwrap_or(0);
         if !elements.iter().all(|column| column.len() == column_len) {
             return Err(Error::DimensionMismatch);
         }
