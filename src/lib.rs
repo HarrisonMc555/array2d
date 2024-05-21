@@ -60,7 +60,7 @@
 //!
 //! pub fn main() -> Result<(), Error> {
 //!     // Create an array filled with the same element.
-//!     let prefilled = Array2D::filled_with(2, 3, 42);
+//!     let prefilled = Array2D::filled_with( 2, 3,42);
 //!     assert_eq!(prefilled.num_rows(), 2);
 //!     assert_eq!(prefilled.num_columns(), 3);
 //!     assert_eq!(prefilled[(0, 0)], 42);
@@ -77,7 +77,7 @@
 //!     // column major order.
 //!     let column_major = vec![1, 4, 2, 5, 3, 6];
 //!     let from_column_major =
-//!         Array2D::from_column_major(2, 3, &column_major)?;
+//!         Array2D::from_column_major( 2, 3,&column_major)?;
 //!     assert_eq!(from_column_major.num_rows(), 2);
 //!     assert_eq!(from_column_major.num_columns(), 3);
 //!     assert_eq!(from_column_major[(1, 1)], 5);
@@ -291,7 +291,7 @@ impl<T> Array2D<T> {
     /// # use array2d::{Array2D, Error};
     /// # fn main() -> Result<(), Error> {
     /// let row_major = vec![1, 2, 3, 4, 5, 6];
-    /// let array = Array2D::from_row_major(2, 3, &row_major)?;
+    /// let array = Array2D::from_row_major( 2, 3,&row_major)?;
     /// assert_eq!(array[(1, 2)], 6);
     /// assert_eq!(array.as_rows(), vec![vec![1, 2, 3], vec![4, 5, 6]]);
     /// # Ok(())
@@ -332,7 +332,7 @@ impl<T> Array2D<T> {
     /// # use array2d::{Array2D, Error};
     /// # fn main() -> Result<(), Error> {
     /// let column_major = vec![1, 4, 2, 5, 3, 6];
-    /// let array = Array2D::from_column_major(2, 3, &column_major)?;
+    /// let array = Array2D::from_column_major( 2, 3,&column_major)?;
     /// assert_eq!(array[(1, 2)], 6);
     /// assert_eq!(array.as_rows(), vec![vec![1, 2, 3], vec![4, 5, 6]]);
     /// # Ok(())
@@ -375,7 +375,7 @@ impl<T> Array2D<T> {
     ///
     /// ```
     /// # use array2d::{Array2D, Error};
-    /// let array = Array2D::filled_with(2, 3, 42);
+    /// let array = Array2D::filled_with( 2, 3,42);
     /// assert_eq!(array.as_rows(), vec![vec![42, 42, 42], vec![42, 42, 42]]);
     /// ```
     ///
@@ -417,7 +417,7 @@ impl<T> Array2D<T> {
     ///     counter += 1;
     ///     tmp
     /// };
-    /// let array = Array2D::filled_by_row_major(2, 3, increment);
+    /// let array = Array2D::filled_by_row_major( 2, 3,increment);
     /// assert_eq!(array.as_rows(), vec![vec![1, 2, 3], vec![4, 5, 6]]);
     /// ```
     ///
@@ -450,7 +450,7 @@ impl<T> Array2D<T> {
     ///     counter += 1;
     ///     tmp
     /// };
-    /// let array = Array2D::filled_by_column_major(2, 3, increment);
+    /// let array = Array2D::filled_by_column_major( 2, 3,increment);
     /// assert_eq!(array.as_columns(), vec![vec![1, 2], vec![3, 4], vec![5, 6]]);
     /// ```
     ///
@@ -480,7 +480,7 @@ impl<T> Array2D<T> {
     /// # use array2d::{Array2D, Error};
     /// # fn main() -> Result<(), Error> {
     /// let iterator = 1..;
-    /// let array = Array2D::from_iter_row_major(2, 3, iterator)?;
+    /// let array = Array2D::from_iter_row_major( 2, 3,iterator)?;
     /// assert_eq!(array.as_rows(), vec![vec![1, 2, 3], vec![4, 5, 6]]);
     /// # Ok(())
     /// # }
@@ -522,7 +522,7 @@ impl<T> Array2D<T> {
     /// # use array2d::{Array2D, Error};
     /// # fn main() -> Result<(), Error> {
     /// let iterator = 1..;
-    /// let array = Array2D::from_iter_column_major(2, 3, iterator)?;
+    /// let array = Array2D::from_iter_column_major( 2, 3,iterator)?;
     /// assert_eq!(array.as_rows(), vec![vec![1, 3, 5], vec![2, 4, 6]]);
     /// # Ok(())
     /// # }
@@ -543,6 +543,136 @@ impl<T> Array2D<T> {
         let array_column_major = iterator.take(total_len).collect::<Vec<_>>();
         Array2D::from_column_major(num_rows, num_columns, &array_column_major)
             .map_err(|_| Error::NotEnoughElements)
+    }
+
+    /// Creates a new [`Array2D`] from an existing [`Array2D`]. Each element is traversed in [row major order]. The
+    /// element is passed to `mapper`, which produces the new element to use in the new array.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// # use array2d::{Array2D, Error};
+    /// # fn main() -> Result<(), Error> {
+    /// let rows = vec![vec![1, 2, 3], vec![4, 5, 6]];
+    /// let array = Array2D::from_rows(&rows)?;
+    /// let new_array = array.map_row_major(|x| x * 10);
+    /// let expected = vec![vec![10, 20, 30], vec![40, 50, 60]];
+    /// assert_eq!(new_array.as_rows(), expected);
+    /// # Ok(())
+    /// # }
+    /// ```
+    ///
+    /// [`Array2D`]: struct.Array2D.html
+    /// [row major order]: https://en.wikipedia.org/wiki/Row-_and_column-major_order
+    pub fn map_row_major<F, U>(&self, mapper: F) -> Array2D<U>
+    where
+        F: FnMut(&T) -> U,
+    {
+        let mut mapper = mapper;
+        Array2D::from_iter_row_major(
+            self.num_rows,
+            self.num_columns,
+            self.enumerate_row_major().map(|(_, element)| mapper(element)),
+        )
+        .expect("Source Array2D should have compatible values for num_rows, num_columns, and enumerate_row_major")
+    }
+
+    /// Creates a new [`Array2D`] from an existing [`Array2D`]. Each element is traversed in [colum  major order]. The
+    /// element is passed to `mapper`, which produces the new element to use in the new array.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// # use array2d::{Array2D, Error};
+    /// # fn main() -> Result<(), Error> {
+    /// let rows = vec![vec![1, 2, 3], vec![4, 5, 6]];
+    /// let array = Array2D::from_rows(&rows)?;
+    /// let new_array = array.map_column_major(|x| x * 10);
+    /// let expected = vec![vec![10, 20, 30], vec![40, 50, 60]];
+    /// assert_eq!(new_array.as_rows(), expected);
+    /// # Ok(())
+    /// # }
+    /// ```
+    ///
+    /// [`Array2D`]: struct.Array2D.html
+    /// [column major order]: https://en.wikipedia.org/wiki/Row-_and_column-major_order
+    pub fn map_column_major<F, U>(&self, mapper: F) -> Array2D<U>
+    where
+        F: FnMut(&T) -> U,
+        U: Clone,
+    {
+        let mut mapper = mapper;
+        Array2D::from_iter_column_major(
+            self.num_rows,
+            self.num_columns,
+            self.enumerate_column_major().map(|(_, element)| mapper(element)),
+        )
+        .expect("Source Array2D should have compatible values for num_rows, num_columns, and enumerate_column_major")
+    }
+
+    /// Creates a new [`Array2D`] from an existing [`Array2D`]. Each element is traversed in [row major order]. The
+    /// index and element are passed to `mapper`, which produces the new element to use in the new array.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// # use array2d::{Array2D, Error};
+    /// # fn main() -> Result<(), Error> {
+    /// let rows = vec![vec![1, 2, 3], vec![4, 5, 6]];
+    /// let array = Array2D::from_rows(&rows)?;
+    /// let new_array = array.map_with_index_row_major(|_, x| x * 10);
+    /// let expected = vec![vec![10, 20, 30], vec![40, 50, 60]];
+    /// assert_eq!(new_array.as_rows(), expected);
+    /// # Ok(())
+    /// # }
+    /// ```
+    ///
+    /// [`Array2D`]: struct.Array2D.html
+    /// [row major order]: https://en.wikipedia.org/wiki/Row-_and_column-major_order
+    pub fn map_with_index_row_major<F, U>(&self, mapper: F) -> Array2D<U>
+    where
+        F: FnMut((usize, usize), &T) -> U,
+    {
+        let mut mapper = mapper;
+        Array2D::from_iter_row_major(
+            self.num_rows,
+            self.num_columns,
+            self.enumerate_row_major().map(|(index, element)| mapper(index, element)),
+        )
+        .expect("Source Array2D should have compatible values for num_rows, num_columns, and enumerate_row_major")
+    }
+
+    /// Creates a new [`Array2D`] from an existing [`Array2D`]. Each element is traversed in [colum  major order]. The
+    /// index and element are passed to `mapper`, which produces the new element to use in the new array.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// # use array2d::{Array2D, Error};
+    /// # fn main() -> Result<(), Error> {
+    /// let rows = vec![vec![1, 2, 3], vec![4, 5, 6]];
+    /// let array = Array2D::from_rows(&rows)?;
+    /// let new_array = array.map_with_index_column_major(|_, x| x * 10);
+    /// let expected = vec![vec![10, 20, 30], vec![40, 50, 60]];
+    /// assert_eq!(new_array.as_rows(), expected);
+    /// # Ok(())
+    /// # }
+    /// ```
+    ///
+    /// [`Array2D`]: struct.Array2D.html
+    /// [column major order]: https://en.wikipedia.org/wiki/Row-_and_column-major_order
+    pub fn map_with_index_column_major<F, U>(&self, mapper: F) -> Array2D<U>
+    where
+        F: FnMut((usize, usize), &T) -> U,
+        U: Clone,
+    {
+        let mut mapper = mapper;
+        Array2D::from_iter_column_major(
+            self.num_rows,
+            self.num_columns,
+            self.enumerate_column_major().map(|(index, element)| mapper(index, element)),
+        )
+        .expect("Source Array2D should have compatible values for num_rows, num_columns, and enumerate_column_major")
     }
 
     /// The number of rows.
@@ -579,7 +709,7 @@ impl<T> Array2D<T> {
     ///
     /// ```
     /// # use array2d::{Array2D, Error};
-    /// let array = Array2D::filled_with(2, 3, 42);
+    /// let array = Array2D::filled_with( 2, 3,42);
     /// assert_eq!(array.get(0, 0), Some(&42));
     /// assert_eq!(array.get(10, 10), None);
     /// ```
@@ -644,7 +774,7 @@ impl<T> Array2D<T> {
     ///
     /// ```
     /// # use array2d::{Array2D, Error};
-    /// let mut array = Array2D::filled_with(2, 3, 42);
+    /// let mut array = Array2D::filled_with( 2, 3,42);
     ///
     /// assert_eq!(array.get_mut(0, 0), Some(&mut 42));
     /// assert_eq!(array.get_mut(10, 10), None);
@@ -729,7 +859,7 @@ impl<T> Array2D<T> {
     ///
     /// ```
     /// # use array2d::{Array2D, Error};
-    /// let mut array = Array2D::filled_with(2, 3, 42);
+    /// let mut array = Array2D::filled_with( 2, 3,42);
     ///
     /// let result = array.set(0, 0, 100);
     /// assert_eq!(result, Ok(()));
@@ -759,7 +889,7 @@ impl<T> Array2D<T> {
     ///
     /// ```
     /// # use array2d::{Array2D, Error};
-    /// let mut array = Array2D::filled_with(2, 3, 42);
+    /// let mut array = Array2D::filled_with( 2, 3,42);
     ///
     /// let result = array.set_row_major(4, 100);
     /// assert_eq!(result, Ok(()));
@@ -789,7 +919,7 @@ impl<T> Array2D<T> {
     ///
     /// ```
     /// # use array2d::{Array2D, Error};
-    /// let mut array = Array2D::filled_with(2, 3, 42);
+    /// let mut array = Array2D::filled_with( 2, 3,42);
     ///
     /// let result = array.set_column_major(4, 100);
     /// assert_eq!(result, Ok(()));
@@ -1246,7 +1376,7 @@ impl<T> Index<(usize, usize)> for Array2D<T> {
     ///
     /// ```
     /// # use array2d::{Array2D, Error};
-    /// let array = Array2D::filled_with(2, 3, 42);
+    /// let array = Array2D::filled_with( 2, 3,42);
     /// assert_eq!(array[(0, 0)], 42);
     /// ```
     ///
@@ -1256,7 +1386,7 @@ impl<T> Index<(usize, usize)> for Array2D<T> {
     ///
     /// ```rust,should_panic
     /// # use array2d::Array2D;
-    /// let array = Array2D::filled_with(2, 3, 42);
+    /// let array = Array2D::filled_with( 2, 3,42);
     /// let element = array[(10, 10)];
     /// ```
     fn index(&self, (row, column): (usize, usize)) -> &Self::Output {
@@ -1273,7 +1403,7 @@ impl<T> IndexMut<(usize, usize)> for Array2D<T> {
     ///
     /// ```
     /// # use array2d::{Array2D, Error};
-    /// let mut array = Array2D::filled_with(2, 3, 42);
+    /// let mut array = Array2D::filled_with( 2, 3,42);
     /// array[(0, 0)] = 100;
     /// assert_eq!(array[(0, 0)], 100);
     /// ```
@@ -1284,7 +1414,7 @@ impl<T> IndexMut<(usize, usize)> for Array2D<T> {
     ///
     /// ```rust,should_panic
     /// # use array2d::Array2D;
-    /// let mut array = Array2D::filled_with(2, 3, 42);
+    /// let mut array = Array2D::filled_with( 2, 3,42);
     /// array[(10, 10)] = 7;
     /// ```
     fn index_mut(&mut self, (row, column): (usize, usize)) -> &mut Self::Output {
