@@ -40,7 +40,7 @@
 //!
 //! [`Array2D`] also supports several forms of iteration. You can iterate
 //! through:
-//!   - All of the elements, in either [row major or column major order] (see
+//!   - All the elements, in either [row major or column major order] (see
 //!     [`elements_row_major_iter`] and [`elements_column_major_iter`]).
 //!   - Individual rows or columns (see [`row_iter`] and [`column_iter`]).
 //!   - All rows or all columns (see [`rows_iter`] and [`columns_iter`]).
