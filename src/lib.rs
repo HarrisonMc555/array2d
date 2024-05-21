@@ -40,7 +40,7 @@
 //!
 //! [`Array2D`] also supports several forms of iteration. You can iterate
 //! through:
-//!   - All of the elements, in either [row major or column major order] (see
+//!   - All the elements, in either [row major or column major order] (see
 //!     [`elements_row_major_iter`] and [`elements_column_major_iter`]).
 //!   - Individual rows or columns (see [`row_iter`] and [`column_iter`]).
 //!   - All rows or all columns (see [`rows_iter`] and [`columns_iter`]).
@@ -190,7 +190,9 @@ pub enum Error {
 impl Display for Error {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
         match self {
-            Error::IndicesOutOfBounds(row, column) => write!(f, "indices ({row}, {column}) out of bounds"),
+            Error::IndicesOutOfBounds(row, column) => {
+                write!(f, "indices ({row}, {column}) out of bounds")
+            }
             Error::IndexOutOfBounds(index) => write!(f, "index {index} out of bounds"),
             Error::DimensionMismatch => write!(f, "dimension mismatch"),
             Error::NotEnoughElements => write!(f, "not enough elements"),
@@ -875,7 +877,10 @@ impl<T> Array2D<T> {
     /// ```
     ///
     /// [`Iterator`]: https://doc.rust-lang.org/std/iter/trait.Iterator.html
-    pub fn row_iter(&self, row_index: usize) -> Result<impl DoubleEndedIterator<Item = &T> + Clone, Error> {
+    pub fn row_iter(
+        &self,
+        row_index: usize,
+    ) -> Result<impl DoubleEndedIterator<Item = &T> + Clone, Error> {
         let start = self
             .get_index(row_index, 0)
             .ok_or(Error::IndicesOutOfBounds(row_index, 0))?;
