@@ -487,6 +487,23 @@ fn test_op_index_mut() -> Result<(), Error> {
     Ok(())
 }
 
+#[test]
+fn test_swap() -> Result<(), Error> {
+    let rows = vec![vec![1, 2, 3], vec![4, 5, 6]];
+    let mut array = Array2D::from_rows(&rows)?;
+
+    assert!(array.swap((0, 1), (1, 0)).is_ok());
+    let expected_rows = vec![vec![1, 4, 3], vec![2, 5, 6]];
+    assert_eq!(array.as_rows(), expected_rows);
+
+    let expected_err = Error::IndicesOutOfBounds(2, 0);
+    assert_eq!(array.swap((0, 1), (2, 0)).unwrap_err(), expected_err);
+    // The failed swap should not have modified the array.
+    assert_eq!(array.as_rows(), expected_rows);
+
+    Ok(())
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 // Error Handling //////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////

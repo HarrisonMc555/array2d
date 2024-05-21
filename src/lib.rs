@@ -1349,6 +1349,40 @@ impl<T> Array2D<T> {
         self.indices_column_major().map(move |i| (i, &self[i]))
     }
 
+    /// Swaps two elements in the [`Array2D`]. Returns an empty [`Ok`] value if both indices are in bounds and the
+    /// values were successfully swapped (if the indices were different). If either index was out of bounds, an
+    /// [`Err`] is returned with the out-of-bounds index.
+    ///
+    /// If `row1` equals to `row2` and `column1` equals to `column2`, it's guaranteed that elements won't change value.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// # use array2d::{Array2D, Error};
+    /// # fn main() -> Result<(), Error> {
+    /// let rows = vec![vec![1, 2, 3], vec![4, 5, 6]];
+    /// let mut array = Array2D::from_rows(&rows)?;
+    /// assert!(array.swap((0, 1), (1, 0)).is_ok());
+    /// let expected_rows = vec![vec![1, 4, 3], vec![2, 5, 6]];
+    /// assert_eq!(array.as_rows(), expected_rows);
+    /// # Ok(())
+    /// # }
+    /// ```
+    pub fn swap(
+        &mut self,
+        (row1, column1): (usize, usize),
+        (row2, column2): (usize, usize),
+    ) -> Result<(), Error> {
+        let index1 = self
+            .get_index(row1, column1)
+            .ok_or(Error::IndicesOutOfBounds(row1, column1))?;
+        let index2 = self
+            .get_index(row2, column2)
+            .ok_or(Error::IndicesOutOfBounds(row2, column2))?;
+        self.array.swap(index1, index2);
+        Ok(())
+    }
+
     fn get_index(&self, row: usize, column: usize) -> Option<usize> {
         if row < self.num_rows && column < self.num_columns {
             Some(row * self.row_len() + column)
