@@ -162,10 +162,13 @@ use std::ops::{Index, IndexMut};
 
 #[cfg(feature = "serde")]
 use serde::{Deserialize, Serialize};
+#[cfg(feature = "bevy_reflect")]
+use bevy_reflect::Reflect;
 
 /// A fixed sized two-dimensional array.
 #[derive(Debug, Clone, Eq, PartialEq, Hash)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
+#[cfg_attr(feature = "bevy_reflect", derive(Reflect))]
 pub struct Array2D<T> {
     array: Vec<T>,
     num_rows: usize,
