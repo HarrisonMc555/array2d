@@ -10,3 +10,4 @@ repository = "https://github.com/HarrisonMc555/array2d"
 
 [dependencies]
 serde = { version = "1.0", features = ["derive"], optional = true }
+bevy_reflect = { version = "0.14.2", optional = true }
