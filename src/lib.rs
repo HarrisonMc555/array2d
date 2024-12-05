@@ -160,10 +160,10 @@
 use std::fmt::{Display, Formatter};
 use std::ops::{Index, IndexMut};
 
-#[cfg(feature = "serde")]
-use serde::{Deserialize, Serialize};
 #[cfg(feature = "bevy_reflect")]
 use bevy_reflect::Reflect;
+#[cfg(feature = "serde")]
+use serde::{Deserialize, Serialize};
 
 /// A fixed sized two-dimensional array.
 #[derive(Debug, Clone, Eq, PartialEq, Hash)]
